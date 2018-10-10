@@ -17,7 +17,7 @@ In a terminal create a new folder and in that folder create a *build.gradle* fil
 ```
 plugins {
   id 'groovy'
-  id 'com.devsoap.fn' version '0.0.1'
+  id 'com.devsoap.fn' version '0.0.2'
 }
 
 version = '1.0.0'
@@ -68,6 +68,10 @@ gradle fnDeploy
 If everything went well we can now invoke our function with
 ```
 gradle fnInvoke
+```
+or if you want to provide some input to the function with
+```
+gradle fnInvoke --input=John
 ```
 
 > **Development tip**: If you are developing run ``gradle -t fnInvoke`` instead. While that is running you can change 
