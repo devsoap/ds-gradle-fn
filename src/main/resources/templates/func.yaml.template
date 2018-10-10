@@ -1,0 +1,9 @@
+schema_version: 20180708
+name: ${applicationName}
+version: ${version}
+runtime: docker
+format: http-stream
+triggers:
+- name: ${triggerName}
+  type: http
+  source: ${triggerPath}
