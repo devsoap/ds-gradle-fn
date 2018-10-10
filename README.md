@@ -74,7 +74,7 @@ gradle fnInvoke
 the source code and Gradle will auto-deploy a new version after every change and invoke it so you can immediately see 
 the function result after the change.
 
-If you want to use a browser instead, you can access the function url at ``http://localhost:8080/t/<functionName>``.
+If you want to use a browser instead, you can access the function url at ``http://localhost:8080/t/<functionName>/<functionName>``.
 
 
 # License
