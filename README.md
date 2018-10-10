@@ -3,7 +3,7 @@
 The Fn Gradle plugin allows you to easily build functions with Java, Groovy or Kotlin for deploying to your Fn Project (https://fnproject.io) server.
 
 The plugin provides helpers for creating a function, building the docker image and deploying it to the server. Under the 
-hook the plugin uses the Fn CLI (https://github.com/fnproject/cli) to perform the actions.
+hood the plugin uses the Fn CLI (https://github.com/fnproject/cli) to perform the actions.
 
 # Getting started
 
