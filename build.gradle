@@ -201,7 +201,7 @@ gradlePlugin {
     //testSourceSets sourceSets.functionalTest
     plugins {
         fnPlugin {
-            id = 'com.devsoap.fn-gradle-plugin'
+            id = 'com.devsoap.fn'
             implementationClass = 'com.devsoap.fn.FnPlugin'
         }
     }
