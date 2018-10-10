@@ -17,7 +17,7 @@ In a terminal create a new folder and in that folder create a *build.gradle* fil
 ```
 plugins {
   id 'groovy'
-  id '
+  id 'com.devsoap.fn' version '0.0.1'
 }
 
 version = '1.0.0'
