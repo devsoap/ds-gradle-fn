@@ -17,6 +17,7 @@ package com.devsoap.fn.tasks
 
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.options.Option
 
 /**
  * Invokes a running function
@@ -29,6 +30,9 @@ class FnInvokeTask extends Exec {
     static final String NAME = 'fnInvoke'
     public static final String FN_COMMAND = 'fn'
 
+    @Option(option = 'input', description = 'Input to send function')
+    String input = ''
+
     @InputDirectory
     final File dockerImageDir = new File(project.buildDir, 'docker')
 
@@ -38,5 +42,11 @@ class FnInvokeTask extends Exec {
         group = FN_COMMAND
         commandLine FN_COMMAND
         args '--verbose', 'invoke', project.name.toLowerCase(), project.name.toLowerCase()
+    }
+
+    @Override
+    protected void exec() {
+        standardInput = new ByteArrayInputStream(input.bytes)
+        super.exec()
     }
 }
