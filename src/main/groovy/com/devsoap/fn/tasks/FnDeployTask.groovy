@@ -65,7 +65,12 @@ class FnDeployTask extends Exec {
         if (local) {
             args += '--local'
         }
+
         super.exec()
+
+        logger.info('Waiting for hot functions to terminate...')
+        FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
+        Thread.sleep(fnDocker.getIdleTimeout())
     }
 
     @Input
@@ -80,7 +85,7 @@ class FnDeployTask extends Exec {
     @PackageScope
     final String getFileHash() {
         String fileHash = ''
-        dockerImageDir.eachFileRecurse { fileHash += it.name }
+        dockerImageDir.eachFileRecurse { fileHash += (it.name + it.lastModified()) }
         HashUtil.sha256(fileHash.bytes).asHexString()
     }
 }

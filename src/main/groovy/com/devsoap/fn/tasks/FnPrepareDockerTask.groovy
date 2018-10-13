@@ -18,14 +18,20 @@ package com.devsoap.fn.tasks
 import com.devsoap.fn.util.TemplateWriter
 import com.devsoap.fn.util.Versions
 import groovy.transform.PackageScope
+import org.apache.tools.ant.util.FileUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.options.Option
+import org.gradle.internal.hash.HashUtil
 import org.gradle.util.RelativePathUtil
 
 /**
@@ -41,28 +47,47 @@ class FnPrepareDockerTask extends DefaultTask {
     public static final String DOCKER_APP_PATH = '/function/app/'
     public static final String LIBS_FOLDER = 'libs'
 
+    @Input
     final Property<String> functionClass = project.objects.property(String)
 
+    @Input
     final Property<String> functionMethod = project.objects.property(String)
 
+    @Optional
+    @Input
     final Property<File> functionYaml = project.objects.property(File)
 
-    @PackageScope
+    @Input
+    final Property<String> triggerName = project.objects.property(String)
+
+    @Input
+    final Property<String> triggerPath = project.objects.property(String)
+
+    @Input
+    final Property<String> triggerType = project.objects.property(String)
+
+    @Input
+    final Property<Integer> idleTimeout = project.objects.property(Integer)
+
+    @Input
+    final Property<Integer> timeout = project.objects.property(Integer)
+
     @OutputDirectory
     final File dockerDir = new File(project.buildDir, 'docker')
 
-    @PackageScope
     @OutputFile
     final File yaml = new File(dockerDir, 'func.yaml')
 
-    @PackageScope
     @OutputFile
     final File dockerfile = new File(dockerDir, 'Dockerfile')
+
+    @InputDirectory
+    final File libs = new File(project.buildDir, LIBS_FOLDER)
 
     FnPrepareDockerTask() {
         group = 'fn'
         description = 'Generates the docker file'
-        dependsOn 'build'
+        dependsOn 'jar'
     }
 
     @TaskAction
@@ -92,6 +117,8 @@ class FnPrepareDockerTask extends DefaultTask {
 
         setCommandInDockerFile(functionClass.get(), functionMethod.get())
 
+        setFileHash() // Must be before files are added to force no-cache if a file is changed
+
         addFilesToDockerFile(copyFilesIntoDockerDir(files), DOCKER_APP_PATH)
 
         addFileToDockerFile(initYaml(), DOCKER_APP_PATH)
@@ -103,7 +130,7 @@ class FnPrepareDockerTask extends DefaultTask {
         }
 
         if (functionYaml.isPresent()) {
-            yaml.text = functionYaml.get().text
+            yaml.text = getFunctionYaml().text
         } else {
             TemplateWriter.builder()
                     .targetDir(dockerDir)
@@ -111,8 +138,12 @@ class FnPrepareDockerTask extends DefaultTask {
                     .substitutions([
                     'applicationName' : project.name.toLowerCase(),
                     'version' : project.version == Project.DEFAULT_VERSION ? 'latest' : project.version,
-                    'triggerName' : "${project.name.toLowerCase()}-trigger",
-                    'triggerPath' : "/${project.name.toLowerCase()}"
+                    'triggerName' : getTriggerName(),
+                    'triggerPath' : getTriggerPath(),
+                    'triggerType' : getTriggerType(),
+                    'timeout' : getTimeout(),
+                    'idleTimeout' : getIdleTimeout(),
+
             ]).build().write()
         }
         yaml
@@ -131,6 +162,9 @@ class FnPrepareDockerTask extends DefaultTask {
     @PackageScope
     List<File> copyFilesIntoDockerDir(List<File> files) {
         File libs = new File(dockerDir, LIBS_FOLDER)
+        if(libs.exists()) {
+            project.delete(libs)
+        }
         files.each { File sourceFile ->
             project.copy {
                 from sourceFile
@@ -167,6 +201,18 @@ class FnPrepareDockerTask extends DefaultTask {
         dockerfile << "FROM $image:$tag" << EOL
     }
 
+    @PackageScope
+    void setFileHash() {
+        dockerfile << "LABEL build.id=$fileHash" << EOL
+    }
+
+    @PackageScope
+    final String getFileHash() {
+        String fileHash = ''
+        dockerDir.eachFileRecurse { fileHash += (it.name + it.lastModified()) }
+        HashUtil.sha256(fileHash.bytes).asHexString()
+    }
+
     String getFunctionClass() {
         functionClass.orNull
     }
@@ -177,6 +223,26 @@ class FnPrepareDockerTask extends DefaultTask {
 
     File getFunctionYaml() {
         functionYaml.orNull
+    }
+
+    String getTriggerName() {
+        triggerName.getOrElse("${project.name.toLowerCase()}-trigger")
+    }
+
+    String getTriggerPath() {
+        triggerPath.getOrElse("/${project.name.toLowerCase()}")
+    }
+
+    String getTriggerType() {
+        triggerType.getOrElse("json")
+    }
+
+    Integer getIdleTimeout() {
+        idleTimeout.getOrElse(1)
+    }
+
+    Integer getTimeout() {
+        timeout.getOrElse(1)
     }
 
     void setFunctionClass(String fc) {
@@ -190,4 +256,25 @@ class FnPrepareDockerTask extends DefaultTask {
     void setFunctionYaml(File file) {
         functionYaml.set(file)
     }
+
+    void setTriggerName(String triggerName) {
+        this.triggerName.set(triggerName)
+    }
+
+    void setTriggerPath(String triggerPath) {
+        this.triggerPath.set(triggerPath)
+    }
+
+    void setTriggerType(String triggerType) {
+        this.triggerType.set(triggerType)
+    }
+
+    void setIdleTimeout(int idleTimeout) {
+        this.idleTimeout.set(idleTimeout)
+    }
+
+    void setTimeout(int timeout) {
+        this.timeout.set(timeout)
+    }
+
 }

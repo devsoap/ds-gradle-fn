@@ -3,7 +3,9 @@ name: ${applicationName}
 version: ${version}
 runtime: docker
 format: http-stream
+idle_timeout: ${idleTimeout}
+timeout: ${timeout}
 triggers:
 - name: ${triggerName}
-  type: http
+  type:  ${triggerType}
   source: ${triggerPath}
