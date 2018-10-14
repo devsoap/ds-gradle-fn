@@ -1,0 +1,11 @@
+package ${functionPackage};
+
+import static java.util.Optional.ofNullable;
+
+class ${functionClass} {
+
+    String ${functionMethod}(String input) {
+        String name = ofNullable(input).orElse("world");
+        return "Hello, " + name + "!";
+    }
+}

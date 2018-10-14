@@ -70,7 +70,7 @@ class FnDeployTask extends Exec {
 
         logger.info('Waiting for hot functions to terminate...')
         FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
-        Thread.sleep(fnDocker.getIdleTimeout())
+        Thread.sleep(fnDocker.idleTimeout)
     }
 
     @Input
