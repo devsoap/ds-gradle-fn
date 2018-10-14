@@ -15,6 +15,7 @@
  */
 package com.devsoap.fn.tasks
 
+import com.devsoap.fn.util.HashUtils
 import com.devsoap.fn.util.LogUtils
 import groovy.transform.PackageScope
 import groovy.util.logging.Log
@@ -56,8 +57,8 @@ class FnDeployTask extends Exec {
         standardOutput = LogUtils.getLogOutputStream(Level.INFO)
         errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
         useLocalDockerInstance.set(true)
-        inputs.property(HASH_PROPERTY) { -> fileHash }
-        outputs.upToDateWhen { inputs.properties.get(HASH_PROPERTY) == fileHash }
+        inputs.property(HASH_PROPERTY) { -> HashUtils.getFileHash(dockerImageDir) }
+        outputs.upToDateWhen { inputs.properties.get(HASH_PROPERTY) == HashUtils.getFileHash(dockerImageDir)  }
     }
 
     @Override
@@ -80,12 +81,5 @@ class FnDeployTask extends Exec {
 
     void setLocal(boolean local) {
         useLocalDockerInstance.set(local)
-    }
-
-    @PackageScope
-    final String getFileHash() {
-        String fileHash = ''
-        dockerImageDir.eachFileRecurse { fileHash += (it.name + it.lastModified()) }
-        HashUtil.sha256(fileHash.bytes).asHexString()
     }
 }

@@ -39,7 +39,7 @@ class FnCreateFunctionTask extends DefaultTask {
     String functionClass = 'MyFunction'
 
     @Input
-    @Option(option = 'name', description = 'The name of the function method entrypoint')
+    @Option(option = 'method', description = 'The name of the function method entrypoint')
     String functionMethod = 'handleRequest'
 
     @Input

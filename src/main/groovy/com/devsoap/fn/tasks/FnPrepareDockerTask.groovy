@@ -15,22 +15,20 @@
  */
 package com.devsoap.fn.tasks
 
+import com.devsoap.fn.util.HashUtils
 import com.devsoap.fn.util.TemplateWriter
 import com.devsoap.fn.util.Versions
 import groovy.transform.PackageScope
-import org.apache.tools.ant.util.FileUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.options.Option
 import org.gradle.internal.hash.HashUtil
 import org.gradle.util.RelativePathUtil
 
@@ -203,14 +201,7 @@ class FnPrepareDockerTask extends DefaultTask {
 
     @PackageScope
     void setFileHash() {
-        dockerfile << "LABEL build.id=$fileHash" << EOL
-    }
-
-    @PackageScope
-    final String getFileHash() {
-        String fileHash = ''
-        dockerDir.eachFileRecurse { fileHash += (it.name + it.lastModified()) }
-        HashUtil.sha256(fileHash.bytes).asHexString()
+        dockerfile << "LABEL build.id=${HashUtils.getFileHash(dockerDir)}" << EOL
     }
 
     String getFunctionClass() {
