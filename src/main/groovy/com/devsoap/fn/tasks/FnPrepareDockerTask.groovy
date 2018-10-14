@@ -162,7 +162,7 @@ class FnPrepareDockerTask extends DefaultTask {
     @PackageScope
     List<File> copyFilesIntoDockerDir(List<File> files) {
         File libs = new File(dockerDir, LIBS_FOLDER)
-        if(libs.exists()) {
+        if (libs.exists()) {
             project.delete(libs)
         }
         files.each { File sourceFile ->
@@ -234,7 +234,7 @@ class FnPrepareDockerTask extends DefaultTask {
     }
 
     String getTriggerType() {
-        triggerType.getOrElse("json")
+        triggerType.getOrElse('json')
     }
 
     Integer getIdleTimeout() {

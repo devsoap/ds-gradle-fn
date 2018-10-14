@@ -3,8 +3,8 @@ package ${functionPackage}
 class ${functionClass} {
 
     String ${functionMethod}(String input) {
-        String name = (input == null || input.isEmpty()) ? "world"  : input;
-        return "Hello, " + name + "!";
+        String name = input ?: 'world'
+        "Hello, $name!"
     }
 
 }
