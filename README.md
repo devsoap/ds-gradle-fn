@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-   compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.5.2'
+   compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.2'
 }
 
 fnDocker {
