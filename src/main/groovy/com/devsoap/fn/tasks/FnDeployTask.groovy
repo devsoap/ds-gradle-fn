@@ -23,7 +23,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.internal.hash.HashUtil
 
 import java.util.logging.Level
 
@@ -41,12 +40,21 @@ class FnDeployTask extends Exec {
     private static final String HASH_PROPERTY = 'fn-deploy-input-hash'
     private static final String FN_COMMAND = 'fn'
 
+    /*
+     * Should the local docker be used, or are we deploying to a remote instance
+     */
     private final Property<Boolean> useLocalDockerInstance = project.objects.property(Boolean)
 
+    /*
+     * The directory where the Dockerfile can be found
+     */
     @PackageScope
     @InputDirectory
     final File dockerImageDir = new File(project.buildDir, 'docker')
 
+    /**
+     * Creates a new deploy task
+     */
     FnDeployTask() {
         dependsOn FnPrepareDockerTask.NAME
         description = 'Deploys the function to the server'
@@ -74,11 +82,17 @@ class FnDeployTask extends Exec {
         Thread.sleep(fnDocker.idleTimeout)
     }
 
+    /**
+     * Is the docker image deployed locally
+     */
     @Input
     boolean isLocal() {
         useLocalDockerInstance.getOrElse(true)
     }
 
+    /**
+     * Should the docker image be deployed to the local docker instance?
+     */
     void setLocal(boolean local) {
         useLocalDockerInstance.set(local)
     }

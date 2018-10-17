@@ -29,7 +29,6 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.internal.hash.HashUtil
 import org.gradle.util.RelativePathUtil
 
 /**
@@ -41,53 +40,96 @@ import org.gradle.util.RelativePathUtil
 class FnPrepareDockerTask extends DefaultTask {
 
     static final String NAME = 'fnDocker'
-    public static final String EOL = '\n'
-    public static final String DOCKER_APP_PATH = '/function/app/'
-    public static final String LIBS_FOLDER = 'libs'
 
+    private static final String EOL = '\n'
+    private static final String DOCKER_APP_PATH = '/function/app/'
+    private static final String LIBS_FOLDER = 'libs'
+
+    /*
+     * The function class name
+     */
     @Input
     final Property<String> functionClass = project.objects.property(String)
 
+    /*
+     * The function method name
+     */
     @Input
     final Property<String> functionMethod = project.objects.property(String)
 
+    /*
+     * Use a custom function.yaml file
+     */
     @Optional
     @Input
     final Property<File> functionYaml = project.objects.property(File)
 
+    /*
+     * If not using a custom func.yaml, then the name of the trigger
+     */
     @Input
     final Property<String> triggerName = project.objects.property(String)
 
+    /*
+    * If not using a custom func.yaml, then the path of the trigger
+    */
     @Input
     final Property<String> triggerPath = project.objects.property(String)
 
+    /*
+    * If not using a custom func.yaml, then the type of the trigger
+    */
     @Input
     final Property<String> triggerType = project.objects.property(String)
 
+    /*
+    * If not using a custom func.yaml, then the idle timeout in seconds
+    */
     @Input
     final Property<Integer> idleTimeout = project.objects.property(Integer)
 
+    /*
+    * If not using a custom func.yaml, then the timeout in seconds
+    */
     @Input
     final Property<Integer> timeout = project.objects.property(Integer)
 
+    /*
+     * The directory where the Dockerfile will be generated
+     */
     @OutputDirectory
     final File dockerDir = new File(project.buildDir, 'docker')
 
+    /*
+    * If not using a custom func.yaml, then the generated func.yaml
+    */
     @OutputFile
     final File yaml = new File(dockerDir, 'func.yaml')
 
+    /*
+    * The Dockerfile in use
+    */
     @OutputFile
     final File dockerfile = new File(dockerDir, 'Dockerfile')
 
+    /*
+    * Where all dependencies which will be included in the Docker image will be assembled
+    */
     @InputDirectory
     final File libs = new File(project.buildDir, LIBS_FOLDER)
 
+    /**
+     * Prepares the docker image for the function
+     */
     FnPrepareDockerTask() {
         group = 'fn'
         description = 'Generates the docker file'
         dependsOn 'jar'
     }
 
+    /**
+     * Prepares the docker image by generated files and copying dependendencies
+     */
     @TaskAction
     void prepareDockerImage() {
         if (!functionClass.isPresent()) {
@@ -147,6 +189,9 @@ class FnPrepareDockerTask extends DefaultTask {
         yaml
     }
 
+    /**
+     * Return the dependencies to package into the docker image
+     */
     @PackageScope
     List<File> getFiles() {
         List<File> files = project.configurations.compile.files.toList()
@@ -157,6 +202,14 @@ class FnPrepareDockerTask extends DefaultTask {
         files
     }
 
+    /**
+     * Copies the given files into the libs directory
+     *
+     * @param files
+     *      the files to copy
+     * @return
+     *      list of files pointing to the copies in the libs direcotry
+     */
     @PackageScope
     List<File> copyFilesIntoDockerDir(List<File> files) {
         File libs = new File(dockerDir, LIBS_FOLDER)
@@ -172,98 +225,210 @@ class FnPrepareDockerTask extends DefaultTask {
         files.collect { File file -> new File(libs, file.name) }
     }
 
+    /**
+     * Add instruction to add a file to the Dockerfile
+     *
+     * @param from
+     *      path from where file is copied
+     * @param to
+     *      target path in docker image
+     */
     @PackageScope
     void addFileToDockerFile(File from, String to) {
         String path = RelativePathUtil.relativePath(dockerDir, from)
         dockerfile << "ADD $path $to" << EOL
     }
 
+    /**
+     * Add instruction to add multiple files ot the Dockerfile
+     *
+     * @param from
+     *      list of paths of files to be copied
+     * @param to
+     *      target path in docker image
+     */
     @PackageScope
     void addFilesToDockerFile(List<File> from, String to) {
         List<String> paths = from.collect { RelativePathUtil.relativePath(dockerDir, it) }
         dockerfile << 'ADD ' << paths.join(' ') << " $to" << EOL
     }
 
+    /**
+     * Add instruction to set the command in the Dockerfile
+     *
+     * @param funcClass
+     *      the Fn function class (FQN)
+     *
+     * @param funcMethod
+     *      the Fn function method
+     */
     @PackageScope
     void setCommandInDockerFile(String funcClass, String funcMethod) {
         dockerfile << "CMD [\"${funcClass}::${funcMethod}\"]" << EOL
     }
 
+    /**
+     * Add instruction to set the workdir in the Dockerfile
+     *
+     * @param workdir
+     *      the workdir path
+     */
     @PackageScope
     void setWorkdirInDockerFile(String workdir) {
         dockerfile << "WORKDIR $workdir" << EOL
     }
 
+    /**
+     * Add instruction to set the base image in the Dockerfile
+     *
+     * @param image
+     *      the image to use
+     * @param tag
+     *      the tag to use
+     */
     @PackageScope
     void setBaseImage(String image, String tag) {
         dockerfile << "FROM $image:$tag" << EOL
     }
 
+    /**
+     * Generates a label instruction to the Dockerfile with the current unique hash
+     */
     @PackageScope
     void setFileHash() {
         dockerfile << "LABEL build.id=${HashUtils.getFileHash(dockerDir)}" << EOL
     }
 
+    /**
+     * Get the function class name (FQN)
+     */
     String getFunctionClass() {
-        functionClass.orNull
+        functionClass.get()
     }
 
+    /**
+     * Get the function method name
+     */
     String getFunctionMethod() {
-        functionMethod.orNull
+        functionMethod.get()
     }
 
+    /**
+     * Get the custom function.yaml file if set
+     */
     File getFunctionYaml() {
         functionYaml.orNull
     }
 
+    /**
+     * Get the trigger name
+     */
     String getTriggerName() {
         triggerName.getOrElse("${project.name.toLowerCase()}-trigger")
     }
 
+    /**
+     * Get the trigger path
+     */
     String getTriggerPath() {
         triggerPath.getOrElse("/${project.name.toLowerCase()}")
     }
 
+    /**
+     * Get the trigger type
+     */
     String getTriggerType() {
         triggerType.getOrElse('json')
     }
 
+    /**
+     * Get the idle timeout of the function
+     */
     Integer getIdleTimeout() {
         idleTimeout.getOrElse(1)
     }
 
+    /**
+     * Get the timeout of the function
+     */
     Integer getTimeout() {
-        timeout.getOrElse(1)
+        timeout.getOrElse(30)
     }
 
+    /**
+     * Set the function class name (FQN)
+     *
+     * @param fc
+     *      the function class FQN
+     */
     void setFunctionClass(String fc) {
         functionClass.set(fc)
     }
 
+    /**
+     * The function method name to call with the request
+     */
     void setFunctionMethod(String fm) {
         functionMethod.set(fm)
     }
 
+    /**
+     * Set the custom func.yaml file to use
+     *
+     * @param file
+     *      the file pointing to a valid func.yaml
+     */
     void setFunctionYaml(File file) {
         functionYaml.set(file)
     }
 
+    /**
+     * Set the trigger name
+     *
+     * @param triggerName
+     *      trigger name to use
+     */
     void setTriggerName(String triggerName) {
         this.triggerName.set(triggerName)
     }
 
+    /**
+     * Set the path the trigger listens to
+     *
+     * @param triggerPath
+     *      the path of the trigger
+     */
     void setTriggerPath(String triggerPath) {
         this.triggerPath.set(triggerPath)
     }
 
+    /**
+     * Set the trigger type
+     *
+     * @param triggerType
+     *      the type of trigger to create
+     *
+     */
     void setTriggerType(String triggerType) {
         this.triggerType.set(triggerType)
     }
 
+    /**
+     * Set the idle timeout of the function
+     *
+     * @param idleTimeout
+     *      the idle-timeout, in seconds, between 1-1000
+     */
     void setIdleTimeout(int idleTimeout) {
         this.idleTimeout.set(idleTimeout)
     }
 
+    /**
+     * Set the timeout of the function
+     *
+     * @param timeout
+     *      the timeout, in seconds, between 1-1000
+     */
     void setTimeout(int timeout) {
         this.timeout.set(timeout)
     }

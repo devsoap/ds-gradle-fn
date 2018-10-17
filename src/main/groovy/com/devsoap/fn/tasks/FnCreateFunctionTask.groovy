@@ -34,23 +34,38 @@ class FnCreateFunctionTask extends DefaultTask {
 
     static final String NAME = 'fnCreateFunction'
 
+    /*
+     * Function class name
+     */
     @Input
     @Option(option = 'name', description = 'The name of the function class')
     String functionClass = 'MyFunction'
 
+    /*
+     * Function method name
+     */
     @Input
     @Option(option = 'method', description = 'The name of the function method entrypoint')
     String functionMethod = 'handleRequest'
 
+    /*
+     * FQN of the package where the function class will be generated
+     */
     @Input
     @Option(option = 'package', description = 'Function package')
     String functionPackage = 'com.example.fn'
 
+    /**
+     * Creates a new FN Creation task
+     */
     FnCreateFunctionTask() {
         description = 'Creates a Fn Function project'
         group = 'fn'
     }
 
+    /**
+     * Creates a new function project
+     */
     @TaskAction
     void run() {
 
@@ -74,7 +89,5 @@ class FnCreateFunctionTask extends DefaultTask {
                     'functionClass' : funcClassName,
                     'functionMethod' : funcMethodName
         ]).build().write()
-
     }
-
 }

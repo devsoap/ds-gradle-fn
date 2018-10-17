@@ -28,14 +28,24 @@ import org.gradle.api.tasks.options.Option
 class FnInvokeTask extends Exec {
 
     static final String NAME = 'fnInvoke'
-    public static final String FN_COMMAND = 'fn'
 
+    private static final String FN_COMMAND = 'fn'
+
+    /*
+     * The input the function should recieve as a String
+     */
     @Option(option = 'input', description = 'Input to send function')
     String input = ''
 
+    /*
+     * The directory where the Dockerfile can be found
+     */
     @InputDirectory
     final File dockerImageDir = new File(project.buildDir, 'docker')
 
+    /**
+     * Creates a new invoice task. Alias for the CLI invoke task
+     */
     FnInvokeTask() {
         dependsOn FnDeployTask.NAME
         description = 'Invokes the function on the server'
