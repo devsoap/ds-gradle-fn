@@ -24,6 +24,7 @@ import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 
+import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 
 /**
@@ -79,7 +80,7 @@ class FnDeployTask extends Exec {
 
         logger.info('Waiting for hot functions to terminate...')
         FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
-        Thread.sleep(fnDocker.idleTimeout)
+        Thread.sleep(TimeUnit.MINUTES.toMillis(fnDocker.idleTimeout))
     }
 
     /**

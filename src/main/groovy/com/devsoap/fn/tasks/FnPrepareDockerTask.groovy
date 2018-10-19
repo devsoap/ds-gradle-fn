@@ -338,7 +338,7 @@ class FnPrepareDockerTask extends DefaultTask {
      * Get the trigger type
      */
     String getTriggerType() {
-        triggerType.getOrElse('json')
+        triggerType.getOrElse('http')
     }
 
     /**

@@ -7,5 +7,5 @@ idle_timeout: ${idleTimeout}
 timeout: ${timeout}
 triggers:
 - name: ${triggerName}
-  type:  ${triggerType}
+  type: ${triggerType}
   source: ${triggerPath}
