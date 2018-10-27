@@ -19,6 +19,8 @@ import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.options.Option
 
+import java.nio.charset.StandardCharsets
+
 /**
  * Invokes a running function
  *
@@ -31,32 +33,41 @@ class FnInvokeTask extends Exec {
 
     private static final String FN_COMMAND = 'fn'
 
-    /*
-     * The input the function should recieve as a String
-     */
     @Option(option = 'input', description = 'Input to send function')
     String input = ''
 
-    /*
-     * The directory where the Dockerfile can be found
-     */
     @InputDirectory
     final File dockerImageDir = new File(project.buildDir, 'docker')
 
-    /**
-     * Creates a new invoice task. Alias for the CLI invoke task
-     */
     FnInvokeTask() {
         dependsOn FnDeployTask.NAME
         description = 'Invokes the function on the server'
         group = FN_COMMAND
         commandLine FN_COMMAND
-        args '--verbose', 'invoke', project.name.toLowerCase(), project.name.toLowerCase()
+        args '--verbose', 'invoke', '--display-call-id', project.name.toLowerCase(), project.name.toLowerCase()
     }
 
     @Override
     protected void exec() {
         standardInput = new ByteArrayInputStream(input.bytes)
-        super.exec()
+        standardOutput = errorOutput = new ByteArrayOutputStream()
+        try {
+            super.exec()
+        } catch(Exception e){
+            def output =  new String(standardOutput.toByteArray(), StandardCharsets.UTF_8)
+            String callId = output.readLines().get(0).split(':')[1].trim()
+            def logs = new ByteArrayOutputStream()
+            try{
+                project.exec { logCmd ->
+                    commandLine FN_COMMAND
+                    standardOutput = logs
+                    args 'get', 'logs', project.name.toLowerCase(), project.name.toLowerCase(), callId
+                }.assertNormalExitValue()
+                logger.error(new String(logs.toByteArray(), StandardCharsets.UTF_8))
+            } catch(Exception e2) {
+                logger.error('Failed to fetch logs for error from server, client error was:', e)
+                logger.debug('Client error', e2)
+            }
+        }
     }
 }
