@@ -15,6 +15,7 @@
  */
 package com.devsoap.fn.tasks
 
+import com.devsoap.fn.util.FnUtils
 import com.devsoap.fn.util.HashUtils
 import com.devsoap.fn.util.LogUtils
 import groovy.transform.PackageScope
@@ -39,7 +40,6 @@ class FnDeployTask extends Exec {
     static final String NAME = 'fnDeploy'
 
     private static final String HASH_PROPERTY = 'fn-deploy-input-hash'
-    private static final String FN_COMMAND = 'fn'
 
     /*
      * Should the local docker be used, or are we deploying to a remote instance
@@ -57,11 +57,11 @@ class FnDeployTask extends Exec {
      * Creates a new deploy task
      */
     FnDeployTask() {
-        dependsOn FnPrepareDockerTask.NAME
+        dependsOn FnPrepareDockerTask.NAME, FnInstallCli.NAME
         description = 'Deploys the function to the server'
-        group = FN_COMMAND
+        group = 'fn'
         workingDir(dockerImageDir)
-        commandLine FN_COMMAND
+        commandLine FnUtils.getFnExecutablePath(project)
         args  '--verbose', 'deploy', '--app', project.name.toLowerCase(), '--no-bump'
         standardOutput = LogUtils.getLogOutputStream(Level.INFO)
         errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)

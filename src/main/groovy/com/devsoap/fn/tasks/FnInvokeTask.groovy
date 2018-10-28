@@ -15,8 +15,8 @@
  */
 package com.devsoap.fn.tasks
 
+import com.devsoap.fn.util.FnUtils
 import groovy.json.JsonBuilder
-import jdk.nashorn.internal.runtime.logging.Logger
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -33,13 +33,11 @@ import java.nio.charset.StandardCharsets
  * @author John Ahlroos
  * @since 1.0
  */
-@Logger
 class FnInvokeTask extends DefaultTask {
 
     static final String NAME = 'fnInvoke'
 
-    private static final String FN_COMMAND = 'fn'
-    public static final String EQUALS = '='
+    private static final String EQUALS = '='
 
     @Option(description = 'Input to send function')
     String input = ''
@@ -66,9 +64,9 @@ class FnInvokeTask extends DefaultTask {
     final File dockerImageDir = new File(project.buildDir, 'docker')
 
     FnInvokeTask() {
-        dependsOn FnDeployTask.NAME
+        dependsOn FnDeployTask.NAME, FnInstallCli.NAME
         description = 'Invokes the function on the server'
-        group = FN_COMMAND
+        group = 'fn'
     }
 
     @TaskAction
@@ -123,7 +121,7 @@ class FnInvokeTask extends DefaultTask {
     private static Map findContexts(Project project) {
         OutputStream output = new ByteArrayOutputStream()
         project.exec { ExecSpec spec ->
-            spec.commandLine FN_COMMAND
+            spec.commandLine FnUtils.getFnExecutablePath(project)
             spec.args 'list', 'context'
             spec.standardOutput = output
         }.assertNormalExitValue()
@@ -139,10 +137,10 @@ class FnInvokeTask extends DefaultTask {
 
     private String getLogForCallId(String callId) {
         OutputStream logs = new ByteArrayOutputStream()
-        project.exec { logCmd ->
-            commandLine FN_COMMAND
-            standardOutput = logs
-            args 'get', 'logs', trigger, application, callId
+        project.exec { ExecSpec spec ->
+            spec.commandLine FnUtils.getFnExecutablePath(project)
+            spec.standardOutput = logs
+            spec.args 'get', 'logs', trigger, application, callId
         }.assertNormalExitValue()
         new String(logs.toByteArray(), StandardCharsets.UTF_8)
     }
