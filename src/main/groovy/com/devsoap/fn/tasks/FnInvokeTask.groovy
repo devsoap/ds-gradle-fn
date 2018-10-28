@@ -39,6 +39,7 @@ class FnInvokeTask extends DefaultTask {
     static final String NAME = 'fnInvoke'
 
     private static final String FN_COMMAND = 'fn'
+    public static final String EQUALS = '='
 
     @Option(description = 'Input to send function')
     String input = ''
@@ -74,7 +75,17 @@ class FnInvokeTask extends DefaultTask {
     void exec() {
         String functionUrl = findContexts(project)[context]
         String baseUrl = "$functionUrl/t/$application/$trigger"
-        String fullUrl = "${baseUrl}${parameters.isEmpty() ? '' : ('?' + parameters.join('&'))}"
+
+        String fullUrl = baseUrl
+        if (!parameters.isEmpty()) {
+            fullUrl += '?'
+            parameters.each { param ->
+                List<String> kv = param.tokenize(EQUALS)
+                String key = kv.remove(0)
+                String value = URLEncoder.encode(kv.join(EQUALS), StandardCharsets.UTF_8)
+                fullUrl += "$key=$value"
+            }
+        }
 
         HttpURLConnection conn = null
         try {
@@ -84,7 +95,7 @@ class FnInvokeTask extends DefaultTask {
             conn.setRequestMethod(method.toUpperCase())
 
             requestHeaders.each {
-                String[] kv = it.split('=')
+                List<String> kv = it.tokenize(EQUALS)
                 conn.setRequestProperty(kv[0], kv[1])
             }
 
