@@ -24,6 +24,7 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import org.gradle.process.ExecSpec
+import org.gradle.process.internal.ExecException
 
 import java.nio.charset.StandardCharsets
 
@@ -137,12 +138,16 @@ class FnInvokeTask extends DefaultTask {
 
     private String getLogForCallId(String callId) {
         OutputStream logs = new ByteArrayOutputStream()
-        project.exec { ExecSpec spec ->
-            spec.commandLine FnUtils.getFnExecutablePath(project)
-            spec.standardOutput = logs
-            spec.args 'get', 'logs', trigger, application, callId
-        }.assertNormalExitValue()
-        new String(logs.toByteArray(), StandardCharsets.UTF_8)
+        try {
+            project.exec { ExecSpec spec ->
+                spec.commandLine FnUtils.getFnExecutablePath(project)
+                spec.standardOutput = logs
+                spec.args 'get', 'logs', trigger, application, callId
+            }.assertNormalExitValue()
+            new String(logs.toByteArray(), StandardCharsets.UTF_8)
+        } catch (ExecException e) {
+            throw new GradleException('Failed to get logs from server, is the server running?')
+        }
     }
 
     private static String formatResponse(String response, String contentType) {

@@ -20,10 +20,12 @@ import com.devsoap.fn.util.HashUtils
 import com.devsoap.fn.util.LogUtils
 import groovy.transform.PackageScope
 import groovy.util.logging.Log
+import org.gradle.api.GradleException
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.process.internal.ExecException
 
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
@@ -76,7 +78,11 @@ class FnDeployTask extends Exec {
             args += '--local'
         }
 
-        super.exec()
+        try {
+            super.exec()
+        } catch (ExecException e) {
+            throw new GradleException('Failed to deploy, is the server running?', e)
+        }
 
         logger.info('Waiting for hot functions to terminate...')
         FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)

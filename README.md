@@ -7,11 +7,8 @@ hood the plugin uses the Fn CLI (https://github.com/fnproject/cli) to perform th
 
 # Getting started
 
-The first thing you need is install **docker** on your local machine. 
-
-Next, you will need to install the Fn Project CLI, see https://github.com/fnproject/cli for instructions.
-
-Once that is done you are all set up to create your first function.
+The only requirement to use the Gradle plugin is to install **docker** on your local machine. Once you have that done
+you can continue with the tutorial.
 
 In a terminal create a new folder and in that folder create a *build.gradle* file with the following contents:
 ```
@@ -57,7 +54,7 @@ You should now have the following project structure:
 6 directories, 2 files
 ```
 
-Start your FN server with by running ``fn start`` to start the fn server locally.
+Start your FN server with by running ``gradle fnStart`` to start the fn server locally.
 
 Once the Fn server is running we can deploy our function there, in the project folder execute the following command to 
 package our function in a docker image and deploy it:
@@ -77,6 +74,11 @@ gradle fnInvoke --input=John
 > **Development tip**: If you are developing run ``gradle -t fnInvoke`` instead. While that is running you can change 
 the source code and Gradle will auto-deploy a new version after every change and invoke it so you can immediately see 
 the function result after the change.
+
+> **Development tip**: You can pass headers to the function by using ``--headers=X-foo=bar,X-Other=Baz``.
+
+> **Development tip**: You can pass query parameters to the function by using ``--params=foo=bar,other=baz``
+`
 
 If you want to use a browser instead, you can access the function url at ``http://localhost:8080/t/<functionName>/<functionName>``.
 

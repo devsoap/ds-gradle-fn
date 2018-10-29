@@ -20,6 +20,8 @@ import com.devsoap.fn.tasks.FnDeployTask
 import com.devsoap.fn.tasks.FnInstallCliTask
 import com.devsoap.fn.tasks.FnInvokeTask
 import com.devsoap.fn.tasks.FnPrepareDockerTask
+import com.devsoap.fn.tasks.FnStartServerTask
+import com.devsoap.fn.tasks.FnStopServerTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -41,6 +43,8 @@ class FnPlugin implements Plugin<Project> {
             register(FnCreateFunctionTask.NAME, FnCreateFunctionTask)
             register(FnDeployTask.NAME, FnDeployTask)
             register(FnInvokeTask.NAME, FnInvokeTask)
+            register(FnStartServerTask.NAME, FnStartServerTask)
+            register(FnStopServerTask.NAME, FnStopServerTask)
         }
     }
 }
