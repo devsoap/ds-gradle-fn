@@ -57,7 +57,7 @@ class FnDeployTask extends Exec {
      * Creates a new deploy task
      */
     FnDeployTask() {
-        dependsOn FnPrepareDockerTask.NAME, FnInstallCli.NAME
+        dependsOn FnPrepareDockerTask.NAME, FnInstallCliTask.NAME
         description = 'Deploys the function to the server'
         group = 'fn'
         workingDir(dockerImageDir)

@@ -17,7 +17,7 @@ package com.devsoap.fn
 
 import com.devsoap.fn.tasks.FnCreateFunctionTask
 import com.devsoap.fn.tasks.FnDeployTask
-import com.devsoap.fn.tasks.FnInstallCli
+import com.devsoap.fn.tasks.FnInstallCliTask
 import com.devsoap.fn.tasks.FnInvokeTask
 import com.devsoap.fn.tasks.FnPrepareDockerTask
 import org.gradle.api.Plugin
@@ -36,7 +36,7 @@ class FnPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.tasks.with {
-            register(FnInstallCli.NAME, FnInstallCli)
+            register(FnInstallCliTask.NAME, FnInstallCliTask)
             register(FnPrepareDockerTask.NAME, FnPrepareDockerTask)
             register(FnCreateFunctionTask.NAME, FnCreateFunctionTask)
             register(FnDeployTask.NAME, FnDeployTask)

@@ -33,7 +33,7 @@ import java.nio.channels.Channels
  * @since 1.0
  */
 @CacheableTask
-class FnInstallCli extends DefaultTask {
+class FnInstallCliTask extends DefaultTask {
 
     static final NAME = 'fnInstall'
 
@@ -44,7 +44,7 @@ class FnInstallCli extends DefaultTask {
     @OutputFile
     final File fnExecutable = new File(FnUtils.getFnExecutablePath(project))
 
-    FnInstallCli() {
+    FnInstallCliTask() {
         group = 'fn'
         inputs.property('fn.installed', fnExecutable.exists())
     }
