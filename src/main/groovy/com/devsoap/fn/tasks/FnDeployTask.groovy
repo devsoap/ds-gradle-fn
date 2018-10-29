@@ -20,6 +20,7 @@ import com.devsoap.fn.util.HashUtils
 import com.devsoap.fn.util.LogUtils
 import groovy.transform.PackageScope
 import groovy.util.logging.Log
+import org.graalvm.compiler.graph.Node
 import org.gradle.api.GradleException
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Exec
@@ -46,7 +47,14 @@ class FnDeployTask extends Exec {
     /*
      * Should the local docker be used, or are we deploying to a remote instance
      */
+    @Input
     private final Property<Boolean> useLocalDockerInstance = project.objects.property(Boolean)
+
+    @Input
+    private final Property<String> registry = project.objects.property(String)
+
+    @Input
+    private final Property<String> api = project.objects.property(String)
 
     /*
      * The directory where the Dockerfile can be found
@@ -76,23 +84,38 @@ class FnDeployTask extends Exec {
     protected void exec() {
         if (local) {
             args += '--local'
+        } else if (registry.isPresent() && api.isPresent()) {
+            args += ['--registry', registry.get()]
+            environment('FN_REGISTRY', registry.get())
+            environment('FN_API_URL', api.get())
+        } else {
+            throw new GradleException('Cannot deploy without docker registry and api URL set')
         }
 
         try {
             super.exec()
         } catch (ExecException e) {
-            throw new GradleException('Failed to deploy, is the server running?', e)
+            if (local) {
+                throw new GradleException('Failed to deploy locally, is the server running?', e)
+            } else {
+                throw new GradleException("Failed to deploy to ${registry.get()}", e)
+            }
         }
 
-        logger.info('Waiting for hot functions to terminate...')
-        FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
-        Thread.sleep(TimeUnit.MINUTES.toMillis(fnDocker.idleTimeout))
+        if (local) {
+            logger.info('Waiting for hot functions to terminate...')
+            FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
+            Thread.sleep(TimeUnit.MINUTES.toMillis(fnDocker.idleTimeout))
+        } else {
+            logger.info("Function successfully deployed to registry ${registry.get()}")
+        }
+
     }
 
     /**
      * Is the docker image deployed locally
      */
-    @Input
+
     boolean isLocal() {
         useLocalDockerInstance.getOrElse(true)
     }
@@ -102,5 +125,35 @@ class FnDeployTask extends Exec {
      */
     void setLocal(boolean local) {
         useLocalDockerInstance.set(local)
+    }
+
+    /**
+     * Get the remote registry uri to deploy to
+     */
+    String getRegistry() {
+        registry.orNull
+    }
+
+    /**
+     * Sets the remote registry uri to deploy to. Also sets local to false.
+     */
+    void setRegistry(String registry) {
+        this.registry.set(registry)
+        this.useLocalDockerInstance.set(false)
+    }
+
+    /**
+     * Get the remote FN Server uri to deploy to
+     */
+    String getApi() {
+        api.orNull
+    }
+
+    /**
+     * set the remote FN Server uri to deploy to
+     */
+    void setApi(String api) {
+        this.api.set(api)
+        this.useLocalDockerInstance.set(false)
     }
 }
