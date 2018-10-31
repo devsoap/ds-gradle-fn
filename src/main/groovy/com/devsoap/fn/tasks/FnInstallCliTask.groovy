@@ -47,6 +47,8 @@ class FnInstallCliTask extends DefaultTask {
     FnInstallCliTask() {
         group = 'fn'
         inputs.property('fn.installed', fnExecutable.exists())
+        description = 'Installs the FN CLI interface'
+        onlyIf { !fnExecutable.exists() }
     }
 
     @TaskAction

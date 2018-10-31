@@ -33,7 +33,7 @@ class FnStopServerTask extends Exec {
 
     FnStopServerTask() {
         dependsOn FnInstallCliTask.NAME
-        description = 'Deploys the function to the server'
+        description = 'Stops the local FN Server'
         group = 'fn'
         commandLine FnUtils.getFnExecutablePath(project)
         args  'stop'

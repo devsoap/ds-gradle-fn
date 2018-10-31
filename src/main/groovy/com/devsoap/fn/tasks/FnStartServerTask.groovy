@@ -33,7 +33,7 @@ class FnStartServerTask extends Exec {
 
     FnStartServerTask() {
         dependsOn FnInstallCliTask.NAME
-        description = 'Deploys the function to the server'
+        description = 'Starts the local FN Server'
         group = 'fn'
         commandLine FnUtils.getFnExecutablePath(project)
         args  'start', '-d'

@@ -25,6 +25,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Optional
 import org.gradle.process.internal.ExecException
 
 import java.util.concurrent.TimeUnit
@@ -47,12 +48,15 @@ class FnDeployTask extends Exec {
      * Should the local docker be used, or are we deploying to a remote instance
      */
     @Input
+    @Optional
     private final Property<Boolean> useLocalDockerInstance = project.objects.property(Boolean)
 
     @Input
+    @Optional
     private final Property<String> registry = project.objects.property(String)
 
     @Input
+    @Optional
     private final Property<String> api = project.objects.property(String)
 
     /*
@@ -81,7 +85,7 @@ class FnDeployTask extends Exec {
 
     @Override
     protected void exec() {
-        if (local) {
+        if (isLocal()) {
             args += '--local'
         } else if (registry.isPresent() && api.isPresent()) {
             args += ['--registry', registry.get()]
@@ -94,14 +98,14 @@ class FnDeployTask extends Exec {
         try {
             super.exec()
         } catch (ExecException e) {
-            if (local) {
+            if (isLocal()) {
                 throw new GradleException('Failed to deploy locally, is the server running?', e)
             } else {
                 throw new GradleException("Failed to deploy to ${registry.get()}", e)
             }
         }
 
-        if (local) {
+        if (isLocal()) {
             logger.info('Waiting for hot functions to terminate...')
             FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
             Thread.sleep(TimeUnit.MINUTES.toMillis(fnDocker.idleTimeout))
@@ -114,8 +118,10 @@ class FnDeployTask extends Exec {
     /**
      * Is the docker image deployed locally
      */
-
     boolean isLocal() {
+        if (registry.isPresent() || api.isPresent()) {
+            return false
+        }
         useLocalDockerInstance.getOrElse(true)
     }
 
@@ -138,7 +144,6 @@ class FnDeployTask extends Exec {
      */
     void setRegistry(String registry) {
         this.registry.set(registry)
-        this.useLocalDockerInstance.set(false)
     }
 
     /**
@@ -153,6 +158,5 @@ class FnDeployTask extends Exec {
      */
     void setApi(String api) {
         this.api.set(api)
-        this.useLocalDockerInstance.set(false)
     }
 }
