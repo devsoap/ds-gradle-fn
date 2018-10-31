@@ -4,7 +4,7 @@ class ${functionClass} {
 
     String ${functionMethod}(String input) {
         String name = input ?: 'world'
-        "Hello, $name!"
+        "Hello, \$name!"
     }
 
 }

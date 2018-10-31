@@ -19,6 +19,7 @@ import com.devsoap.fn.util.ProjectType
 import com.devsoap.fn.util.TemplateWriter
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 
@@ -38,22 +39,24 @@ class FnCreateFunctionTask extends DefaultTask {
      * Function class name
      */
     @Input
+    @Optional
     @Option(option = 'name', description = 'The name of the function class')
-    String functionClass = 'MyFunction'
+    String functionClass
 
     /*
      * Function method name
      */
     @Input
+    @Optional
     @Option(option = 'method', description = 'The name of the function method entrypoint')
-    String functionMethod = 'handleRequest'
+    String functionMethod
 
     /*
      * FQN of the package where the function class will be generated
      */
     @Input
     @Option(option = 'package', description = 'Function package')
-    String functionPackage = 'com.example.fn'
+    String functionPackage = 'com.example'
 
     /**
      * Creates a new FN Creation task
@@ -68,6 +71,21 @@ class FnCreateFunctionTask extends DefaultTask {
      */
     @TaskAction
     void run() {
+        FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
+
+        if(!functionMethod && fnDocker.functionMethod) {
+            functionMethod = fnDocker.functionMethod
+        } else {
+            functionMethod = 'handleRequest'
+        }
+
+        if(!functionClass && fnDocker.functionClass) {
+            List<String> tokens = fnDocker.functionClass.tokenize('.')
+            functionClass = tokens.last()
+            functionPackage = tokens.dropRight(1).join('.')
+        } else {
+            functionClass = 'MyFunction'
+        }
 
         File root = project.projectDir
         File sourceMain = Paths.get(root.canonicalPath, 'src', 'main').toFile()
