@@ -82,6 +82,9 @@ the function result after the change.
 
 If you want to use a browser instead, you can access the function url at ``http://localhost:8080/t/<functionName>/<functionName>``.
 
+# Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. To become a sponsor send a mail to sponsor@devsoap.com.
 
 # License
 
