@@ -27,7 +27,7 @@ dependencies {
    compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.2'
 }
 
-fnDocker {
+fn {
   functionClass = 'com.example.fn.MyFunction'
   functionMethod = 'handleRequest'
 }

@@ -15,6 +15,7 @@
  */
 package com.devsoap.fn.tasks
 
+import com.devsoap.fn.extensions.FnExtension
 import com.devsoap.fn.util.HashUtils
 import com.devsoap.fn.util.TemplateWriter
 import com.devsoap.fn.util.Versions
@@ -44,18 +45,6 @@ class FnPrepareDockerTask extends DefaultTask {
     private static final String EOL = '\n'
     private static final String DOCKER_APP_PATH = '/function/app/'
     private static final String LIBS_FOLDER = 'libs'
-
-    /*
-     * The function class name
-     */
-    @Input
-    final Property<String> functionClass = project.objects.property(String)
-
-    /*
-     * The function method name
-     */
-    @Input
-    final Property<String> functionMethod = project.objects.property(String)
 
     /*
      * Use a custom function.yaml file
@@ -132,16 +121,10 @@ class FnPrepareDockerTask extends DefaultTask {
      */
     @TaskAction
     void prepareDockerImage() {
-        if (!functionClass.isPresent()) {
-            throw new GradleException('Function class must be set')
-        }
-
-        if (!functionMethod.isPresent()) {
-            throw new GradleException('Function method must be set')
-        }
+        FnExtension fn = project.extensions.getByType(FnExtension)
 
         if (!project.name) {
-            throw new GradleException('Project name needs to be set')
+            throw new GradleException('project.name needs to be set')
         }
 
         if (dockerfile.exists()) {
@@ -155,7 +138,7 @@ class FnPrepareDockerTask extends DefaultTask {
 
         setWorkdirInDockerFile('/function')
 
-        setCommandInDockerFile(functionClass.get(), functionMethod.get())
+        setCommandInDockerFile(fn.functionClass, fn.functionMethod)
 
         setFileHash() // Must be before files are added to force no-cache if a file is changed
 
@@ -300,20 +283,6 @@ class FnPrepareDockerTask extends DefaultTask {
     }
 
     /**
-     * Get the function class name (FQN)
-     */
-    String getFunctionClass() {
-        functionClass.get()
-    }
-
-    /**
-     * Get the function method name
-     */
-    String getFunctionMethod() {
-        functionMethod.get()
-    }
-
-    /**
      * Get the custom function.yaml file if set
      */
     File getFunctionYaml() {
@@ -353,23 +322,6 @@ class FnPrepareDockerTask extends DefaultTask {
      */
     Integer getTimeout() {
         timeout.getOrElse(30)
-    }
-
-    /**
-     * Set the function class name (FQN)
-     *
-     * @param fc
-     *      the function class FQN
-     */
-    void setFunctionClass(String fc) {
-        functionClass.set(fc)
-    }
-
-    /**
-     * The function method name to call with the request
-     */
-    void setFunctionMethod(String fm) {
-        functionMethod.set(fm)
     }
 
     /**

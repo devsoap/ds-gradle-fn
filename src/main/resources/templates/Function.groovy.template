@@ -1,6 +1,4 @@
-package ${functionPackage}
-
-class ${functionClass} {
+${ functionPackage ? "package $functionPackage\n\n" : '' }class ${functionClass} {
 
     String ${functionMethod}(String input) {
         String name = input ?: 'world'

@@ -15,6 +15,7 @@
  */
 package com.devsoap.fn
 
+import com.devsoap.fn.extensions.FnExtension
 import com.devsoap.fn.tasks.FnCreateFunctionTask
 import com.devsoap.fn.tasks.FnDeployTask
 import com.devsoap.fn.tasks.FnInstallCliTask
@@ -37,14 +38,19 @@ class FnPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        project.tasks.with {
-            register(FnInstallCliTask.NAME, FnInstallCliTask)
-            register(FnPrepareDockerTask.NAME, FnPrepareDockerTask)
-            register(FnCreateFunctionTask.NAME, FnCreateFunctionTask)
-            register(FnDeployTask.NAME, FnDeployTask)
-            register(FnInvokeTask.NAME, FnInvokeTask)
-            register(FnStartServerTask.NAME, FnStartServerTask)
-            register(FnStopServerTask.NAME, FnStopServerTask)
+        project.with {
+            tasks.with {
+                register(FnInstallCliTask.NAME, FnInstallCliTask)
+                register(FnPrepareDockerTask.NAME, FnPrepareDockerTask)
+                register(FnCreateFunctionTask.NAME, FnCreateFunctionTask)
+                register(FnDeployTask.NAME, FnDeployTask)
+                register(FnInvokeTask.NAME, FnInvokeTask)
+                register(FnStartServerTask.NAME, FnStartServerTask)
+                register(FnStopServerTask.NAME, FnStopServerTask)
+            }
+            extensions.with {
+                create(FnExtension.NAME, FnExtension, project)
+            }
         }
     }
 }

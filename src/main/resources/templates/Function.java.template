@@ -1,11 +1,9 @@
-package ${functionPackage};
-
-import static java.util.Optional.ofNullable;
+${ functionPackage ? "package $functionPackage;\n\n" : '' }import static java.util.Optional.ofNullable;
 
 public class ${functionClass} {
 
     public String ${functionMethod}(String input) {
-        String name = ofNullable(input).orElse("world");
+        String name = ofNullable(input).filter(s -> !s.isEmpty()).orElse("world");
         return "Hello, " + name + "!";
     }
 }

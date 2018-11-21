@@ -1,6 +1,4 @@
-package ${functionPackage}
-
-fun ${functionMethod}(args: String?): String {
+${ functionPackage ? "package $functionPackage\n\n" : '' }fun ${functionMethod}(args: String?): String {
     val name:String = args ?: "world"
     return "Hello, \$name"
 }

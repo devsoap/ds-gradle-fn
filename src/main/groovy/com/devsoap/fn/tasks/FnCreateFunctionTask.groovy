@@ -15,6 +15,7 @@
  */
 package com.devsoap.fn.tasks
 
+import com.devsoap.fn.extensions.FnExtension
 import com.devsoap.fn.util.ProjectType
 import com.devsoap.fn.util.TemplateWriter
 import org.gradle.api.DefaultTask
@@ -73,20 +74,14 @@ class FnCreateFunctionTask extends DefaultTask {
      */
     @TaskAction
     void run() {
-        FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
+        FnExtension fn = project.extensions.getByType(FnExtension)
 
-        if (!functionMethod && fnDocker.functionMethod) {
-            functionMethod = fnDocker.functionMethod
-        } else {
-            functionMethod = 'handleRequest'
-        }
+        functionMethod = functionMethod ?: fn.functionMethod
 
-        if (!functionClass && fnDocker.functionClass) {
-            List<String> tokens = fnDocker.functionClass.tokenize(DOT)
+        if (!functionClass) {
+            List<String> tokens = fn.functionClass.tokenize(DOT)
             functionClass = tokens.last()
             functionPackage = tokens.dropRight(1).join(DOT)
-        } else {
-            functionClass = 'MyFunction'
         }
 
         File root = project.projectDir
