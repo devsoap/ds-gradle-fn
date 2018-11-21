@@ -41,6 +41,12 @@ class FnPluginAction extends PluginAction {
         super.execute(project)
 
         project.with {
+
+            repositories.maven { repository ->
+                repository.name = 'Gradle Plugin Portal'
+                repository.url = 'https://plugins.gradle.org/m2/'
+            }
+
             String pluginDependency =
                     "com.devsoap:fn-gradle-plugin:${Versions.rawVersion('fn.plugin.version')}"
             Dependency vaadin = dependencies.create(pluginDependency) {
