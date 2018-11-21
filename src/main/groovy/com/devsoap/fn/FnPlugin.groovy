@@ -15,6 +15,8 @@
  */
 package com.devsoap.fn
 
+import com.devsoap.fn.actions.FnPluginAction
+import com.devsoap.fn.actions.PluginAction
 import com.devsoap.fn.extensions.FnExtension
 import com.devsoap.fn.tasks.FnCreateFunctionTask
 import com.devsoap.fn.tasks.FnDeployTask
@@ -25,6 +27,9 @@ import com.devsoap.fn.tasks.FnStartServerTask
 import com.devsoap.fn.tasks.FnStopServerTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.internal.reflect.Instantiator
+
+import javax.inject.Inject
 
 /**
  * Builder for creating writers for writing a template to the file system
@@ -36,9 +41,19 @@ class FnPlugin implements Plugin<Project> {
 
     static final String PLUGIN_ID = 'com.devsoap.fn'
 
+    private final List<PluginAction> actions = []
+
+    @Inject
+    FnPlugin(Instantiator instantiator) {
+        actions << instantiator.newInstance(FnPluginAction)
+    }
+
     @Override
     void apply(Project project) {
         project.with {
+            actions.each { action ->
+                action.apply(project)
+            }
             tasks.with {
                 register(FnInstallCliTask.NAME, FnInstallCliTask)
                 register(FnPrepareDockerTask.NAME, FnPrepareDockerTask)
