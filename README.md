@@ -84,7 +84,7 @@ If you want to use a browser instead, you can access the function url at ``http:
 
 # Sponsors
 
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. To find out more about becoming a sponsor see the [Become a sponsor](https://devsoap.com/gradle-vaadin-flow-plugin#supporttheproject) page.
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. To find out more about becoming a sponsor see the [Become a sponsor](https://devsoap.com/fn-project-gradle-plugin#supporttheproject) page.
 
 # License
 
