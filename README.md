@@ -10,6 +10,12 @@ hood the plugin uses the Fn CLI (https://github.com/fnproject/cli) to perform th
 The only requirement to use the Gradle plugin is to install **docker** on your local machine. Once you have that done
 you can continue with the tutorial.
 
+Now lets create a new project:
+
+<a href="https://devsoap.com/fn-project-gradle-plugin">
+   <img src="https://devsoap.com/content/images/2018/11/fn-plugin-gradle-configuration.gif" />
+</a>
+
 In a terminal create a new folder and in that folder create a *build.gradle* file with the following contents:
 ```
 plugins {
@@ -34,7 +40,14 @@ fn {
 
 ```
 
-Next run the following command in your terminal to create the project:
+Now you are ready to create the function. Next do the following:
+
+<a href="https://devsoap.com/fn-project-gradle-plugin">
+   <img src="https://devsoap.com/content/images/2018/11/fn-plugin-create-and-invoke-function.gif" />
+</a>
+
+In the console type:
+
 ```
 gradle fnCreateFunction
 ```
