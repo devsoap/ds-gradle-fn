@@ -5,6 +5,11 @@ The Fn Gradle plugin allows you to easily build functions with Java, Groovy or K
 The plugin provides helpers for creating a function, building the docker image and deploying it to the server. Under the 
 hood the plugin uses the Fn CLI (https://github.com/fnproject/cli) to perform the actions.
 
+[![Build Status](https://api.travis-ci.org/devsoap/fn-gradle-plugin.svg?branch=master)](https://travis-ci.org/devsoap/fn-gradle-plugin)
+[![Latest Release](https://img.shields.io/github/release/devsoap/fn-gradle-plugin.svg)](https://plugins.gradle.org/plugin/fn-gradle-plugin)
+[![License](https://img.shields.io/github/license/devsoap/fn-gradle-plugin.svg)](https://github.com/devsoap/fn-gradle-plugin/blob/master/LICENSE)
+
+
 # Getting started
 
 The only requirement to use the Gradle plugin is to install **docker** on your local machine. Once you have that done
