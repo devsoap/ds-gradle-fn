@@ -15,6 +15,7 @@
  */
 package com.devsoap.fn.tasks
 
+import com.devsoap.fn.util.DockerUtil
 import com.devsoap.fn.util.FnUtils
 import com.devsoap.fn.util.LogUtils
 import org.gradle.api.tasks.Exec
@@ -33,6 +34,9 @@ class FnStopServerTask extends Exec {
 
     FnStopServerTask() {
         dependsOn FnInstallCliTask.NAME
+        onlyIf {
+            DockerUtil.isContainerRunning(project,'fnserver')
+        }
         description = 'Stops the local FN Server'
         group = 'fn'
         commandLine FnUtils.getFnExecutablePath(project)

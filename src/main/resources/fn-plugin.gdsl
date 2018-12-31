@@ -19,15 +19,29 @@ def gradleType = 'gradle'
 def fnCtx = context(ctype: fnType)
 def scriptContext = context(scriptType: gradleType, filetypes:[gradleType], scope: scriptScope())
 def closureCtx = context(scriptType: gradleType, filetypes:[gradleType], scope: closureScope())
+def gradleArtifactRepositoryType = 'org.gradle.api.artifacts.repositories.ArtifactRepository'
+def gradleDependencyType = 'org.gradle.api.artifacts.Dependency'
 
 contributor(fnCtx, {
-    if(!enclosingMember()){
+    if(enclosingCall('repositories')) {
+        method name: 'fnproject', type: gradleArtifactRepositoryType
+
+    } else if(enclosingCall('dependencies')) {
+        method name: 'api', type: gradleDependencyType
+        method name: 'flow', type: gradleDependencyType
+        method name: 'groovy', type: gradleDependencyType
+
+    }else if(!enclosingMember()){
         property name: "functionClass", type: String.name
         property name: 'functionMethod', type: String.name
+
     }
 })
 
 contributor(closureCtx, {
+    if(enclosingCall('repositories') || enclosingCall('dependencies')) {
+        property name: fnProperty, type: fnType
+    }
     if(enclosingCall(fnProperty)) {
         property name: "functionClass", type: String.name
         property name: 'functionMethod', type: String.name

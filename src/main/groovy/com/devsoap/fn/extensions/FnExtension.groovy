@@ -15,7 +15,12 @@
  */
 package com.devsoap.fn.extensions
 
+import com.devsoap.fn.util.Versions
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.artifacts.dsl.RepositoryHandler
+import org.gradle.api.artifacts.repositories.ArtifactRepository
 import org.gradle.api.provider.Property
 
 /**
@@ -31,9 +36,14 @@ class FnExtension {
     private final Property<String> functionClass
     private final Property<String> functionMethod
 
+    private final DependencyHandler dependencyHandler
+    private final RepositoryHandler repositoryHandler
+
     FnExtension(Project project) {
         functionClass = project.objects.property(String)
         functionMethod = project.objects.property(String)
+        dependencyHandler = project.dependencies
+        repositoryHandler = project.repositories
     }
 
     /**
@@ -65,5 +75,51 @@ class FnExtension {
      */
     String getFunctionMethod() {
         functionMethod.getOrElse('handleRequest')
+    }
+
+    /**
+     * Returns the FN Project private maven repository
+     */
+    ArtifactRepository fnproject() {
+        repository('FN Project Maven Repository', 'https://dl.bintray.com/fnproject/fnproject')
+    }
+
+    /**
+     * Returns the FN Flow runtime dependency
+     */
+    Dependency flow() {
+        String version = Versions.rawVersion('fn.java.flow.version')
+        dependencyHandler.create("com.fnproject.fn:flow-runtime:$version")
+    }
+
+    /**
+     * Returns the FN Api dependency
+     */
+    Dependency api() {
+        String version = Versions.rawVersion('fn.java.fdk.version')
+        dependencyHandler.create("com.fnproject.fn:api:$version")
+    }
+
+    /**
+     * Returns a compatible Groovy version
+     */
+    Dependency groovy() {
+        String version = Versions.rawVersion('groovy.version')
+        dependencyHandler.create("org.codehaus.groovy:groovy:$version")
+    }
+
+    /**
+     * Define a Maven repository
+     *
+     * @param name
+     *      the name for the repository
+     * @param url
+     *      the url of the repository
+     */
+    private ArtifactRepository repository(String name, String url) {
+        repositoryHandler.maven { repository ->
+            repository.name = name
+            repository.url = url
+        }
     }
 }

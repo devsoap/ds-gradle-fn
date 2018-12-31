@@ -72,16 +72,16 @@ class FnPrepareDockerTask extends DefaultTask {
     final Property<String> triggerType = project.objects.property(String)
 
     /*
-    * If not using a custom func.yaml, then the idle timeout in seconds
+    * If not using a custom func.yaml, then the idle functionTimeout in seconds
     */
     @Input
     final Property<Integer> idleTimeout = project.objects.property(Integer)
 
     /*
-    * If not using a custom func.yaml, then the timeout in seconds
+    * If not using a custom func.yaml, then the functionTimeout in seconds
     */
     @Input
-    final Property<Integer> timeout = project.objects.property(Integer)
+    final Property<Integer> functionTimeout = project.objects.property(Integer)
 
     /*
      * The directory where the Dockerfile will be generated
@@ -159,13 +159,13 @@ class FnPrepareDockerTask extends DefaultTask {
                     .targetDir(dockerDir)
                     .templateFileName(yaml.name)
                     .substitutions([
-                    'applicationName' : project.name.toLowerCase(),
+                    'functionName' : project.name.toLowerCase(),
                     'version' : (project.version == Project.DEFAULT_VERSION ? '' : project.version)
                             + new Date().format('yyyyMMddssmm'),
                     'triggerName' : getTriggerName(),
                     'triggerPath' : getTriggerPath(),
                     'triggerType' : getTriggerType(),
-                    'timeout' : getTimeout(),
+                    'functionTimeout' : getFunctionTimeout(),
                     'idleTimeout' : getIdleTimeout(),
 
             ]).build().write()
@@ -287,42 +287,42 @@ class FnPrepareDockerTask extends DefaultTask {
      * Get the custom function.yaml file if set
      */
     File getFunctionYaml() {
-        functionYaml.orNull
+        this.functionYaml.orNull
     }
 
     /**
      * Get the trigger name
      */
     String getTriggerName() {
-        triggerName.getOrElse("${project.name.toLowerCase()}-trigger")
+        this.triggerName.getOrElse("${project.name.toLowerCase()}-trigger")
     }
 
     /**
      * Get the trigger path
      */
     String getTriggerPath() {
-        triggerPath.getOrElse("/${project.name.toLowerCase()}")
+        this.triggerPath.getOrElse("/${project.name.toLowerCase()}")
     }
 
     /**
      * Get the trigger type
      */
     String getTriggerType() {
-        triggerType.getOrElse('http')
+        this.triggerType.getOrElse('http')
     }
 
     /**
-     * Get the idle timeout of the function
+     * Get the idle functionTimeout of the function
      */
     Integer getIdleTimeout() {
-        idleTimeout.getOrElse(1)
+        this.idleTimeout.getOrElse(1)
     }
 
     /**
-     * Get the timeout of the function
+     * Get the functionTimeout of the function
      */
-    Integer getTimeout() {
-        timeout.getOrElse(30)
+    Integer getFunctionTimeout() {
+        this.functionTimeout.getOrElse(30)
     }
 
     /**
@@ -332,7 +332,7 @@ class FnPrepareDockerTask extends DefaultTask {
      *      the file pointing to a valid func.yaml
      */
     void setFunctionYaml(File file) {
-        functionYaml.set(file)
+        this.functionYaml.set(file)
     }
 
     /**
@@ -367,23 +367,23 @@ class FnPrepareDockerTask extends DefaultTask {
     }
 
     /**
-     * Set the idle timeout of the function
+     * Set the idle functionTimeout of the function
      *
      * @param idleTimeout
-     *      the idle-timeout, in seconds, between 1-1000
+     *      the idle-functionTimeout, in seconds, between 1-1000
      */
     void setIdleTimeout(int idleTimeout) {
         this.idleTimeout.set(idleTimeout)
     }
 
     /**
-     * Set the timeout of the function
+     * Set the functionTimeout of the function
      *
      * @param timeout
-     *      the timeout, in seconds, between 1-1000
+     *      the functionTimeout, in seconds, between 1-1000
      */
-    void setTimeout(int timeout) {
-        this.timeout.set(timeout)
+    void setFunctionTimeout(int timeout) {
+        this.functionTimeout.set(timeout)
     }
 
 }

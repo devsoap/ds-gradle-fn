@@ -15,6 +15,7 @@
  */
 package com.devsoap.fn.tasks
 
+import com.devsoap.fn.util.DockerUtil
 import com.devsoap.fn.util.FnUtils
 import com.devsoap.fn.util.HashUtils
 import com.devsoap.fn.util.LogUtils
@@ -75,7 +76,7 @@ class FnDeployTask extends Exec {
         group = 'fn'
         workingDir(dockerImageDir)
         commandLine FnUtils.getFnExecutablePath(project)
-        args  '--verbose', 'deploy', '--app', project.name.toLowerCase(), '--no-bump'
+        args  '--verbose', 'deploy', '--app', project.rootProject.name.toLowerCase(), '--no-bump'
         standardOutput = LogUtils.getLogOutputStream(Level.INFO)
         errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
         useLocalDockerInstance.set(true)
@@ -106,6 +107,18 @@ class FnDeployTask extends Exec {
         }
 
         if (isLocal()) {
+
+            // Configure completer base url for Flow
+            String baseUrl = "http://${DockerUtil.resolveContainerAddress(project, 'flowserver')}:${FnStartFlowServerTask.FN_FLOW_SERVER_PORT}"
+            logger.info("Setting  COMPLETER_BASE_URL=$baseUrl")
+            project.exec {
+                workingDir(dockerImageDir)
+                commandLine FnUtils.getFnExecutablePath(project)
+                args 'config', 'app', project.rootProject.name.toLowerCase(), 'COMPLETER_BASE_URL', baseUrl
+                standardOutput = LogUtils.getLogOutputStream(Level.INFO)
+                errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
+            }
+
             logger.info('Waiting for hot functions to terminate...')
             FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
             Thread.sleep(TimeUnit.MINUTES.toMillis(fnDocker.idleTimeout))
