@@ -71,7 +71,7 @@ class FnInvokeTask extends DefaultTask {
     }
 
     @TaskAction
-    void exec() {
+    void invoke() {
         String functionUrl = findContexts(project)[context]
         String baseUrl = "$functionUrl/t/$application/$trigger"
 

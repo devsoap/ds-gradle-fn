@@ -43,7 +43,7 @@ class FnStopFlowServerTask extends DefaultTask {
     }
 
     @TaskAction
-    void execute() {
+    void run() {
         if (DockerUtil.isContainerRunning(project, FLOW_SERVER)) {
             stopFlowServer()
         }

@@ -56,7 +56,7 @@ class FnStartFlowServerTask extends DefaultTask {
     }
 
     @TaskAction
-    void execute() {
+    void start() {
         String fnServerAddress = DockerUtil.resolveContainerAddress(project, 'fnserver')
         if (!fnServerAddress) {
             throw new GradleException('FN Server is not running, aborting starting FN Flow server')
