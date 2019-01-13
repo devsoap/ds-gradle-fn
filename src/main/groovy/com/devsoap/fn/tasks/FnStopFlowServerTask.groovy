@@ -31,6 +31,10 @@ import java.util.logging.Level
 class FnStopFlowServerTask extends DefaultTask {
 
     static String NAME = 'fnFlowStop'
+    public static final String FLOW_SERVER = 'flowserver'
+    public static final String DOCKER = 'docker'
+    public static final String STOP = 'stop'
+    public static final String FLOW_UI = 'flowui'
 
     FnStopFlowServerTask() {
         dependsOn FnStopServerTask.NAME
@@ -40,18 +44,18 @@ class FnStopFlowServerTask extends DefaultTask {
 
     @TaskAction
     void execute() {
-        if(DockerUtil.isContainerRunning(project, 'flowserver')) {
+        if (DockerUtil.isContainerRunning(project, FLOW_SERVER)) {
             stopFlowServer()
         }
-        if(DockerUtil.isContainerRunning(project, 'flowui')) {
+        if (DockerUtil.isContainerRunning(project, FLOW_UI)) {
             stopFlowUIServer()
         }
     }
 
     private void stopFlowServer() {
         project.exec {
-            commandLine 'docker'
-            args 'stop', 'flowserver'
+            commandLine DOCKER
+            args STOP, FLOW_SERVER
             standardOutput = LogUtils.getLogOutputStream(Level.INFO)
             errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
         }
@@ -59,8 +63,8 @@ class FnStopFlowServerTask extends DefaultTask {
 
     private void stopFlowUIServer() {
         project.exec {
-            commandLine 'docker'
-            args 'stop', 'flowui'
+            commandLine DOCKER
+            args STOP, FLOW_UI
             standardOutput = LogUtils.getLogOutputStream(Level.INFO)
             errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
         }

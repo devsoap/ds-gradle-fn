@@ -35,7 +35,7 @@ class FnStopServerTask extends Exec {
     FnStopServerTask() {
         dependsOn FnInstallCliTask.NAME
         onlyIf {
-            DockerUtil.isContainerRunning(project,'fnserver')
+            DockerUtil.isContainerRunning(project, 'fnserver')
         }
         description = 'Stops the local FN Server'
         group = 'fn'

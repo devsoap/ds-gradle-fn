@@ -35,7 +35,7 @@ class FnStartServerTask extends Exec {
     FnStartServerTask() {
         dependsOn FnInstallCliTask.NAME
         onlyIf {
-           !DockerUtil.isContainerRunning(project,'fnserver')
+           !DockerUtil.isContainerRunning(project, 'fnserver')
         }
         description = 'Starts the local FN Server'
         group = 'fn'

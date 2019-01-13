@@ -109,7 +109,8 @@ class FnDeployTask extends Exec {
         if (isLocal()) {
 
             // Configure completer base url for Flow
-            String baseUrl = "http://${DockerUtil.resolveContainerAddress(project, 'flowserver')}:${FnStartFlowServerTask.FN_FLOW_SERVER_PORT}"
+            String address = DockerUtil.resolveContainerAddress(project, 'flowserver')
+            String baseUrl = "http://${address}:${FnStartFlowServerTask.FN_FLOW_SERVER_PORT}"
             logger.info("Setting  COMPLETER_BASE_URL=$baseUrl")
             project.exec {
                 workingDir(dockerImageDir)
