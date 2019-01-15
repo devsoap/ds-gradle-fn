@@ -109,15 +109,17 @@ class FnDeployTask extends Exec {
         if (isLocal()) {
 
             // Configure completer base url for Flow
-            String address = DockerUtil.resolveContainerAddress(project, 'flowserver')
-            String baseUrl = "http://${address}:${FnStartFlowServerTask.FN_FLOW_SERVER_PORT}"
-            logger.info("Setting  COMPLETER_BASE_URL=$baseUrl")
-            project.exec {
-                workingDir(dockerImageDir)
-                commandLine FnUtils.getFnExecutablePath(project)
-                args 'config', 'app', project.rootProject.name.toLowerCase(), 'COMPLETER_BASE_URL', baseUrl
-                standardOutput = LogUtils.getLogOutputStream(Level.INFO)
-                errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
+            if (DockerUtil.isContainerRunning(project, "flowserver")) {
+                String address = DockerUtil.resolveContainerAddress(project, 'flowserver')
+                String baseUrl = "http://${address}:${FnStartFlowServerTask.FN_FLOW_SERVER_PORT}"
+                logger.info("Setting  COMPLETER_BASE_URL=$baseUrl")
+                project.exec {
+                    workingDir(dockerImageDir)
+                    commandLine FnUtils.getFnExecutablePath(project)
+                    args 'config', 'app', project.rootProject.name.toLowerCase(), 'COMPLETER_BASE_URL', baseUrl
+                    standardOutput = LogUtils.getLogOutputStream(Level.INFO)
+                    errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
+                }
             }
 
             logger.info('Waiting for hot functions to terminate...')

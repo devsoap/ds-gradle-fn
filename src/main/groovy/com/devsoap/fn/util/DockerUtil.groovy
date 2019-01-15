@@ -16,8 +16,10 @@
 package com.devsoap.fn.util
 
 import org.gradle.api.Project
+import org.gradle.process.internal.ExecException
 
 import java.nio.charset.StandardCharsets
+import java.util.logging.Level
 
 /**
  * Utilities for executing Docker commands
@@ -32,7 +34,11 @@ class DockerUtil {
     }
 
     static boolean isContainerRunning(Project project, String container) {
-        inspectContainerProperty(project, container,  'State.Running').toBoolean()
+        try {
+            return inspectContainerProperty(project, container,  'State.Running').toBoolean()
+        } catch(ExecException e) {
+            return false
+        }
     }
 
     private static String inspectContainerProperty(Project project, String container, String property) {
@@ -42,6 +48,7 @@ class DockerUtil {
                 commandLine 'docker'
                 args  'inspect', '--type', 'container', '-f', "'{{.$property}}'", container
                 standardOutput = propertyStream
+                errorOutput = LogUtils.getLogOutputStream(Level.FINE)
             }.rethrowFailure()
         }
         String out = new String(propertyStream.toByteArray(), StandardCharsets.UTF_8)
