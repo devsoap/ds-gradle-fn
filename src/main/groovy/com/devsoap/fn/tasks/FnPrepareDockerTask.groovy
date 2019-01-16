@@ -300,7 +300,8 @@ class FnPrepareDockerTask extends DefaultTask {
      * Get the trigger name
      */
     String getTriggerName() {
-        this.triggerName.getOrElse("${getFunctionName()}-trigger")
+        String defaultName = getFunctionName().length() >= 22 ? project.name : getFunctionName()
+        this.triggerName.getOrElse("$defaultName-tgr")
     }
 
     /**
