@@ -140,7 +140,7 @@ class FnPrepareDockerTask extends DefaultTask {
             dockerfile.createNewFile()
         }
 
-        setBaseImage('fnproject/fn-java-fdk', Versions.rawVersion('fn.java.fdk.version'))
+        setBaseImage('fnproject/fn-java-fdk', Versions.rawVersion('fn.java.fdk.baseimage.version'))
 
         setWorkdirInDockerFile('/function')
 
