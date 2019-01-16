@@ -73,9 +73,7 @@ class FnInvokeTask extends DefaultTask {
     @TaskAction
     void invoke() {
         FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
-        if(!trigger) {
-            trigger = fnDocker.triggerName
-        }
+        trigger = trigger ?: fnDocker.triggerName
 
         String functionUrl = findContexts(project)[context]
         String baseUrl = "$functionUrl/t/$application/$trigger"

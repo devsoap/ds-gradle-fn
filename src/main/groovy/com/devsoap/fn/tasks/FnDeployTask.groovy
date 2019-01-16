@@ -44,6 +44,7 @@ class FnDeployTask extends Exec {
     static final String NAME = 'fnDeploy'
 
     private static final String HASH_PROPERTY = 'fn-deploy-input-hash'
+    private static final String FLOWSERVER = 'flowserver'
 
     /*
      * Should the local docker be used, or are we deploying to a remote instance
@@ -109,8 +110,8 @@ class FnDeployTask extends Exec {
         if (isLocal()) {
 
             // Configure completer base url for Flow
-            if (DockerUtil.isContainerRunning(project, "flowserver")) {
-                String address = DockerUtil.resolveContainerAddress(project, 'flowserver')
+            if (DockerUtil.isContainerRunning(project, FLOWSERVER)) {
+                String address = DockerUtil.resolveContainerAddress(project, FLOWSERVER)
                 String baseUrl = "http://${address}:${FnStartFlowServerTask.FN_FLOW_SERVER_PORT}"
                 logger.info("Setting  COMPLETER_BASE_URL=$baseUrl")
                 project.exec {

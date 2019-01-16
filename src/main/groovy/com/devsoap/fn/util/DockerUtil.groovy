@@ -36,7 +36,7 @@ class DockerUtil {
     static boolean isContainerRunning(Project project, String container) {
         try {
             return inspectContainerProperty(project, container,  'State.Running').toBoolean()
-        } catch(ExecException e) {
+        } catch (ExecException e) {
             return false
         }
     }
