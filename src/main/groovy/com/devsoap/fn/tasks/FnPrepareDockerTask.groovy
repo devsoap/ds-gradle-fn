@@ -54,6 +54,12 @@ class FnPrepareDockerTask extends DefaultTask {
     final Property<File> functionYaml = project.objects.property(File)
 
     /*
+     * If not using a custom func.yaml, then the name of the function
+     */
+    @Input
+    final Property<String> functionName = project.objects.property(String)
+
+    /*
      * If not using a custom func.yaml, then the name of the trigger
      */
     @Input
@@ -159,7 +165,7 @@ class FnPrepareDockerTask extends DefaultTask {
                     .targetDir(dockerDir)
                     .templateFileName(yaml.name)
                     .substitutions([
-                    'functionName' : project.name.toLowerCase(),
+                    'functionName' : getFunctionName(),
                     'version' : (project.version == Project.DEFAULT_VERSION ? '' : project.version)
                             + new Date().format('yyyyMMddssmm'),
                     'triggerName' : getTriggerName(),
@@ -294,14 +300,14 @@ class FnPrepareDockerTask extends DefaultTask {
      * Get the trigger name
      */
     String getTriggerName() {
-        this.triggerName.getOrElse("${project.name.toLowerCase()}-trigger")
+        this.triggerName.getOrElse("${getFunctionName()}-trigger")
     }
 
     /**
      * Get the trigger path
      */
     String getTriggerPath() {
-        this.triggerPath.getOrElse("/${project.name.toLowerCase()}")
+        this.triggerPath.getOrElse("/${project.name}")
     }
 
     /**
@@ -386,4 +392,21 @@ class FnPrepareDockerTask extends DefaultTask {
         this.functionTimeout.set(timeout)
     }
 
+    /**
+     * Get the function name
+     */
+    String getFunctionName() {
+        functionName.getOrElse(project.parent == null ?
+                        project.name.toLowerCase() : "$project.rootProject.name-$project.name".toLowerCase())
+    }
+
+    /**
+     * Set the function name
+     *
+     * @param name
+     *      the function name
+     */
+    void setFunctionName(String name) {
+        this.functionName.set(name)
+    }
 }

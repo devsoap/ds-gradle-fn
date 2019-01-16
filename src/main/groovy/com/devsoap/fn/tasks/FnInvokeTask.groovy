@@ -44,10 +44,10 @@ class FnInvokeTask extends DefaultTask {
     String input = ''
 
     @Option(description = 'Trigger to invoke')
-    String trigger = project.name.toLowerCase()
+    String trigger = ''
 
     @Option(option = 'app', description = 'Application to invoke')
-    String application = project.name.toLowerCase()
+    String application = project.rootProject.name.toLowerCase()
 
     @Option(description = 'The function context')
     String context = 'default'
@@ -72,6 +72,11 @@ class FnInvokeTask extends DefaultTask {
 
     @TaskAction
     void invoke() {
+        FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
+        if(!trigger) {
+            trigger = fnDocker.triggerName
+        }
+
         String functionUrl = findContexts(project)[context]
         String baseUrl = "$functionUrl/t/$application/$trigger"
 
