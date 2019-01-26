@@ -70,6 +70,9 @@ class FnPlugin implements Plugin<Project> {
                 if (!findByName(FnInstallCliTask.NAME)) {
                     register(FnInstallCliTask.NAME, FnInstallCliTask)
                 }
+                if (!findByName(FnCreateFunctionTask.NAME)) {
+                    register(FnCreateFunctionTask.NAME, FnCreateFunctionTask)
+                }
             }
         }
 

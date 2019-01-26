@@ -37,6 +37,9 @@ class FnCreateFunctionTask extends DefaultTask {
     static final String NAME = 'fnCreateFunction'
 
     private static final String DOT = '.'
+    private static final String SRC = 'src'
+    private static final String MAIN = 'main'
+    private static final String DOT_PATTERN = '\\.'
 
     /*
      * Function class name
@@ -61,6 +64,10 @@ class FnCreateFunctionTask extends DefaultTask {
     @Option(option = 'package', description = 'Function package')
     String functionPackage = 'com.example'
 
+    @Input
+    @Option(option = 'module', description = 'Create function as a submodule')
+    boolean asSubModule = false
+
     /**
      * Creates a new FN Creation task
      */
@@ -74,6 +81,17 @@ class FnCreateFunctionTask extends DefaultTask {
      */
     @TaskAction
     void run() {
+
+        boolean hasFnExtension = project.extensions.findByName(FnExtension.NAME)
+
+        if (asSubModule || !hasFnExtension) {
+            initFunctionAsSubmodule()
+        } else {
+            initFunctionInCurrentProject()
+        }
+    }
+
+    private void initFunctionInCurrentProject() {
         FnExtension fn = project.extensions.getByType(FnExtension)
 
         functionMethod = functionMethod ?: fn.functionMethod
@@ -85,24 +103,76 @@ class FnCreateFunctionTask extends DefaultTask {
         }
 
         File root = project.projectDir
-        File sourceMain = Paths.get(root.canonicalPath, 'src', 'main').toFile()
+        File sourceMain = Paths.get(root.canonicalPath, SRC, MAIN).toFile()
 
         ProjectType projectType = ProjectType.get(project)
         File languageSourceDir = new File(sourceMain, projectType.sourceDir)
         String sourceFileExtension = projectType.extension
 
-        File pkgDir = Paths.get(languageSourceDir.canonicalPath, functionPackage.split('\\.')).toFile()
+        File pkgDir = Paths.get(languageSourceDir.canonicalPath, functionPackage.split(DOT_PATTERN)).toFile()
         String funcClassName = TemplateWriter.makeStringJavaCompatible(functionClass)
         String funcMethodName = TemplateWriter.makeStringJavaCompatible(functionMethod).uncapitalize()
+
+        initGradleFile(root, funcClassName, funcMethodName)
 
         TemplateWriter.builder()
                 .templateFileName("Function.$sourceFileExtension")
                 .targetDir(pkgDir)
                 .targetFileName("${funcClassName}.$sourceFileExtension")
                 .substitutions([
-                    'functionPackage' : functionPackage,
-                    'functionClass' : funcClassName,
-                    'functionMethod' : funcMethodName
+                'functionPackage' : functionPackage,
+                'functionClass' : funcClassName,
+                'functionMethod' : funcMethodName
         ]).build().write()
+    }
+
+    private void initFunctionAsSubmodule() {
+
+        functionMethod = functionMethod ?: 'handleRequest'
+        functionClass =  functionClass ?: 'MyFunction'
+
+        File parentRoot = project.projectDir
+
+        File gradleSettings = new File(project.rootDir, 'settings.gradle')
+        if (gradleSettings.exists()) {
+            gradleSettings << "\ninclude '${functionClass.toLowerCase()}'"
+        } else {
+            gradleSettings.text = "include '${functionClass.toLowerCase()}'"
+        }
+
+        File root = new File(parentRoot, functionClass.toLowerCase())
+        root.mkdir()
+
+        File sourceMain = Paths.get(root.canonicalPath, SRC, MAIN).toFile()
+
+        ProjectType projectType = ProjectType.get(project)
+        File languageSourceDir = new File(sourceMain, projectType.sourceDir)
+        String sourceFileExtension = projectType.extension
+
+        File pkgDir = Paths.get(languageSourceDir.canonicalPath, functionPackage.split(DOT_PATTERN)).toFile()
+        String funcClassName = TemplateWriter.makeStringJavaCompatible(functionClass)
+        String funcMethodName = TemplateWriter.makeStringJavaCompatible(functionMethod).uncapitalize()
+
+        initGradleFile(root, funcClassName, funcMethodName)
+
+        TemplateWriter.builder()
+                .templateFileName("Function.$sourceFileExtension")
+                .targetDir(pkgDir)
+                .targetFileName("${funcClassName}.$sourceFileExtension")
+                .substitutions([
+                'functionPackage' : functionPackage,
+                'functionClass' : funcClassName,
+                'functionMethod' : funcMethodName
+        ]).build().write()
+    }
+
+    private void initGradleFile(File root, String funcClassName, String funcMethodName) {
+        File gradleBuild = new File(root, 'build.gradle')
+        gradleBuild << """
+        fn {
+            functionClass = '${functionPackage}.$funcClassName'
+            functionMethod = '$funcMethodName'
+        }
+        """.stripIndent()
     }
 }
