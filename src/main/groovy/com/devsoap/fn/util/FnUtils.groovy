@@ -37,12 +37,13 @@ class FnUtils {
      *      the project to get the path for
      */
     static final String getFnExecutablePath(Project project) {
+        File fnFolder = Paths.get(project.rootDir.canonicalPath, '.gradle', FN).toFile()
         if (Os.isFamily(Os.FAMILY_UNIX)) {
-            Paths.get(project.buildDir.canonicalPath, FN, 'fn_linux').toFile().canonicalPath
+            new File(fnFolder, 'fn_linux').canonicalPath
         } else if (Os.isFamily(Os.FAMILY_MAC)) {
-            Paths.get(project.buildDir.canonicalPath, FN, 'fn_mac').toFile().canonicalPath
+            new File(fnFolder, 'fn_mac').canonicalPath
         } else if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-            Paths.get(project.buildDir.canonicalPath, FN, 'fn.exe').toFile().canonicalPath
+            new File(fnFolder, 'fn.exe').canonicalPath
         } else {
             FN // Fallback to globally installed FN
         }

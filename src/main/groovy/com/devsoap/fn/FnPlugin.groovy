@@ -52,20 +52,36 @@ class FnPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+
+        project.rootProject.with {
+            tasks.with {
+                if (!findByName(FnStartServerTask.NAME)) {
+                    register(FnStartServerTask.NAME, FnStartServerTask)
+                }
+                if (!findByName(FnStopServerTask.NAME)) {
+                    register(FnStopServerTask.NAME, FnStopServerTask)
+                }
+                if (!findByName(FnStartFlowServerTask.NAME)) {
+                    register(FnStartFlowServerTask.NAME, FnStartFlowServerTask)
+                }
+                if (!findByName(FnStopFlowServerTask.NAME)) {
+                    register(FnStopFlowServerTask.NAME, FnStopFlowServerTask)
+                }
+                if (!findByName(FnInstallCliTask.NAME)) {
+                    register(FnInstallCliTask.NAME, FnInstallCliTask)
+                }
+            }
+        }
+
         project.with {
             actions.each { action ->
                 action.apply(project)
             }
             tasks.with {
-                register(FnInstallCliTask.NAME, FnInstallCliTask)
                 register(FnPrepareDockerTask.NAME, FnPrepareDockerTask)
                 register(FnCreateFunctionTask.NAME, FnCreateFunctionTask)
                 register(FnDeployTask.NAME, FnDeployTask)
                 register(FnInvokeTask.NAME, FnInvokeTask)
-                register(FnStartServerTask.NAME, FnStartServerTask)
-                register(FnStopServerTask.NAME, FnStopServerTask)
-                register(FnStartFlowServerTask.NAME, FnStartFlowServerTask)
-                register(FnStopFlowServerTask.NAME, FnStopFlowServerTask)
             }
             extensions.with {
                 create(FnExtension.NAME, FnExtension, project)

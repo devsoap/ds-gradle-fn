@@ -65,7 +65,7 @@ class FnInvokeTask extends DefaultTask {
     final File dockerImageDir = new File(project.buildDir, 'docker')
 
     FnInvokeTask() {
-        dependsOn FnDeployTask.NAME, FnInstallCliTask.NAME
+        dependsOn FnDeployTask.NAME, ':' + FnInstallCliTask.NAME
         description = 'Invokes the function on the server'
         group = 'fn'
     }
