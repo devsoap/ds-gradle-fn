@@ -97,6 +97,12 @@ class FnDeployTask extends Exec {
             throw new GradleException('Cannot deploy without docker registry and api URL set')
         }
 
+        if (isLocal()) {
+            logger.info('Removing old function image...')
+            FnPrepareDockerTask fnDocker = project.tasks.findByName(FnPrepareDockerTask.NAME)
+            FnUtils.removeFunction(project, project.rootProject.name.toLowerCase(), fnDocker.functionName )
+        }
+
         try {
             super.exec()
         } catch (ExecException e) {
@@ -122,10 +128,6 @@ class FnDeployTask extends Exec {
                     errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
                 }
             }
-
-            logger.info('Waiting for hot functions to terminate...')
-            FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
-            Thread.sleep(TimeUnit.MINUTES.toMillis(fnDocker.idleTimeout))
         } else {
             logger.info("Function successfully deployed to registry ${registry.get()}")
         }

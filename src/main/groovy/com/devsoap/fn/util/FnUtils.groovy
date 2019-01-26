@@ -17,8 +17,12 @@ package com.devsoap.fn.util
 
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
+import org.gradle.process.ExecResult
+import org.gradle.process.internal.ExecException
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
+import java.util.logging.Level
 
 /**
  * Utilities for running the FN CLI
@@ -46,6 +50,56 @@ class FnUtils {
             new File(fnFolder, 'fn.exe').canonicalPath
         } else {
             FN // Fallback to globally installed FN
+        }
+    }
+
+    /**
+     * Get all active functions for an application
+     *
+     * @param project
+     *      the project with the function
+     * @param application
+     *      the application name
+     */
+    static final Map<String, String> getFunctions(Project project, String application) {
+        OutputStream output = new ByteArrayOutputStream()
+        try {
+            project.exec {
+                commandLine getFnExecutablePath(project)
+                args 'list', 'functions', application
+                standardOutput = output
+                errorOutput = LogUtils.getLogOutputStream(Level.FINE)
+            }
+        } catch (ExecException ignored) {
+            return [:]
+        }
+
+        Map functions = [:]
+        new String(output.toByteArray(), StandardCharsets.UTF_8).readLines().reverse().remove(0).eachLine { line ->
+            String[] columns = line.split('\\t')
+            functions[columns[0]] = columns[2]
+        }
+        functions
+    }
+
+    /**
+     * Remove an active function
+     *
+     * @param project
+     *      the project with the function
+     * @param application
+     *      the application name
+     * @param function
+     *      the function name
+     */
+    static final void removeFunction(Project project, String application, String function) {
+        if (getFunctions(project, application).keySet().contains(function)) {
+            project.exec {
+                commandLine getFnExecutablePath(project)
+                args 'delete', 'function', application, function
+                standardOutput = LogUtils.getLogOutputStream(Level.INFO)
+                errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
+            }
         }
     }
 }

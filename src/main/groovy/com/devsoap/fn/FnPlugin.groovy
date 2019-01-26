@@ -82,9 +82,11 @@ class FnPlugin implements Plugin<Project> {
             }
             tasks.with {
                 register(FnPrepareDockerTask.NAME, FnPrepareDockerTask)
-                register(FnCreateFunctionTask.NAME, FnCreateFunctionTask)
                 register(FnDeployTask.NAME, FnDeployTask)
                 register(FnInvokeTask.NAME, FnInvokeTask)
+                if (!findByName(FnCreateFunctionTask.NAME)) {
+                    register(FnCreateFunctionTask.NAME, FnCreateFunctionTask)
+                }
             }
             extensions.with {
                 create(FnExtension.NAME, FnExtension, project)
