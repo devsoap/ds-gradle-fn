@@ -15,6 +15,7 @@
  */
 package com.devsoap.fn.extensions
 
+import com.devsoap.fn.tasks.FnPrepareDockerTask
 import com.devsoap.fn.util.Versions
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
@@ -38,8 +39,10 @@ class FnExtension {
 
     private final DependencyHandler dependencyHandler
     private final RepositoryHandler repositoryHandler
+    private final Project project
 
     FnExtension(Project project) {
+        this.project = project
         functionClass = project.objects.property(String)
         functionMethod = project.objects.property(String)
         dependencyHandler = project.dependencies
@@ -75,6 +78,25 @@ class FnExtension {
      */
     String getFunctionMethod() {
         functionMethod.getOrElse('handleRequest')
+    }
+
+    /**
+     * Set the function path
+     *
+     * @param path
+     *      the path that the function listens to
+     */
+    void setFunctionPath(String path) {
+        FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
+        fnDocker.triggerPath = path
+    }
+
+    /**
+     * Get the function path
+     */
+    String getFunctionPath() {
+        FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
+        fnDocker.triggerPath
     }
 
     /**

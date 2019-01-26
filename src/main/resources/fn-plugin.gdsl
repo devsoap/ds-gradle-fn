@@ -34,7 +34,7 @@ contributor(fnCtx, {
     }else if(!enclosingMember()){
         property name: "functionClass", type: String.name
         property name: 'functionMethod', type: String.name
-
+        property name: 'functionPath', type: String.name
     }
 })
 
@@ -45,6 +45,7 @@ contributor(closureCtx, {
     if(enclosingCall(fnProperty)) {
         property name: "functionClass", type: String.name
         property name: 'functionMethod', type: String.name
+        property name: 'functionPath', type: String.name
     }
 })
 
