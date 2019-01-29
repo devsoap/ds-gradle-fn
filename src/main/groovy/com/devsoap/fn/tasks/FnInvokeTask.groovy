@@ -39,8 +39,9 @@ class FnInvokeTask extends DefaultTask {
     static final String NAME = 'fnInvoke'
 
     private static final String EQUALS = '='
-    public static final String LIST = 'list'
-    public static final String TAB_CHARACTER = '\\t'
+    private static final String LIST = 'list'
+    private static final String TAB_CHARACTER = '\\t'
+    private static final int VALUE_COLUMN = 4
 
     @Option(description = 'Input to send function')
     String input = ''
@@ -74,13 +75,12 @@ class FnInvokeTask extends DefaultTask {
 
     @TaskAction
     void invoke() {
-        FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
-        trigger = trigger ?: fnDocker.triggerName
-
         String functionUrl = findContexts(project)[context]
         logger.info("Function base url is $functionUrl")
 
-        String triggerUrl = findTriggers(project, application)[trigger]
+        FnPrepareDockerTask fnDocker = project.tasks.findByName(FnPrepareDockerTask.NAME)
+        Map triggers = findTriggers(project, application, fnDocker.functionName)
+        String  triggerUrl = trigger ? triggers[trigger] : triggers.entrySet().first().value
         logger.info("Function trigger url is $triggerUrl")
 
         String fullUrl = triggerUrl
@@ -115,7 +115,16 @@ class FnInvokeTask extends DefaultTask {
 
             String response = conn.content.text
             String contentType = conn.getHeaderField('Content-Type')
+
+            println ''
+            println ''
+            println '================ FUNCTION RESPONSE ===================='
+            println ''
             println formatResponse(response, contentType)
+            println ''
+            println '======================================================='
+            println ''
+            println ''
 
         } catch (IOException e) {
             String callId = conn?.getHeaderField('Fn-Call-Id')
@@ -142,24 +151,24 @@ class FnInvokeTask extends DefaultTask {
         Map contexts = [:]
         new String(output.toByteArray(), StandardCharsets.UTF_8).readLines().reverse().remove(0).eachLine { line ->
             String[] columns = line.split(TAB_CHARACTER)
-            contexts[columns[1]] = columns[4]
+            contexts[columns[1]] = columns[VALUE_COLUMN]
         }
         project.logger.info("Found contexts $contexts")
         contexts
     }
 
-    private static Map findTriggers(Project project, String application) {
+    private static Map findTriggers(Project project, String application, String function) {
         OutputStream output = new ByteArrayOutputStream()
         project.exec { ExecSpec spec ->
             spec.commandLine FnUtils.getFnExecutablePath(project)
-            spec.args LIST, 'triggers', application
+            spec.args LIST, 'triggers', application, function
             spec.standardOutput = output
         }.assertNormalExitValue()
 
         Map triggers = [:]
-        new String(output.toByteArray(), StandardCharsets.UTF_8).readLines().reverse().remove(0).eachLine { line ->
+        new String(output.toByteArray(), StandardCharsets.UTF_8).readLines().reverse().dropRight(1).each { line ->
             String[] columns = line.split(TAB_CHARACTER)
-            triggers[columns[1]] = columns[5]
+            triggers[columns[0]] = columns[VALUE_COLUMN]
         }
 
         project.logger.info("Found triggers $triggers")
