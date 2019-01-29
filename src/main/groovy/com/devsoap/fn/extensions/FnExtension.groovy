@@ -86,17 +86,17 @@ class FnExtension {
      * @param path
      *      the path that the function listens to
      */
-    void setFunctionPath(String path) {
+    void setFunctionPaths(List<String> path) {
         FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
-        fnDocker.triggerPath = path
+        fnDocker.triggerPaths = path
     }
 
     /**
      * Get the function path
      */
-    String getFunctionPath() {
+    List<String> getFunctionPaths() {
         FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
-        fnDocker.triggerPath
+        fnDocker.triggerPaths
     }
 
     /**

@@ -23,6 +23,7 @@ import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -69,7 +70,7 @@ class FnPrepareDockerTask extends DefaultTask {
     * If not using a custom func.yaml, then the path of the trigger
     */
     @Input
-    final Property<String> triggerPath = project.objects.property(String)
+    final ListProperty<String> triggerPaths = project.objects.listProperty(String)
 
     /*
     * If not using a custom func.yaml, then the type of the trigger
@@ -169,7 +170,7 @@ class FnPrepareDockerTask extends DefaultTask {
                     'version' : (project.version == Project.DEFAULT_VERSION ? '' : project.version)
                             + new Date().format('yyyyMMddssmm'),
                     'triggerName' : getTriggerName(),
-                    'triggerPath' : getTriggerPath(),
+                    'triggerPaths' : getTriggerPaths(),
                     'triggerType' : getTriggerType(),
                     'functionTimeout' : getFunctionTimeout(),
                     'idleTimeout' : getIdleTimeout(),
@@ -307,8 +308,8 @@ class FnPrepareDockerTask extends DefaultTask {
     /**
      * Get the trigger path
      */
-    String getTriggerPath() {
-        this.triggerPath.getOrElse("/${project.name}")
+    List<String> getTriggerPaths() {
+        this.triggerPaths.getOrElse(["/${project.name}"])
     }
 
     /**
@@ -358,8 +359,8 @@ class FnPrepareDockerTask extends DefaultTask {
      * @param triggerPath
      *      the path of the trigger
      */
-    void setTriggerPath(String triggerPath) {
-        this.triggerPath.set(triggerPath)
+    void setTriggerPaths(List<String> triggerPaths) {
+        this.triggerPaths.set(triggerPaths)
     }
 
     /**

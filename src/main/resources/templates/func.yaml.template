@@ -6,6 +6,8 @@ format: http-stream
 idle_timeout: ${idleTimeout}
 timeout: ${timeout}
 triggers:
-- name: ${triggerName}
-  type: ${triggerType}
-  source: ${triggerPath}
+<% triggerPaths.eachWithIndex { path, idx ->
+    println "- name: ${triggerName}-${idx}"
+    println "  type: ${triggerType}"
+    println "  source: ${path}"
+} %>
