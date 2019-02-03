@@ -33,6 +33,8 @@ import org.gradle.api.provider.Property
 class FnExtension {
 
     static final String NAME = 'fn'
+    private static final String GROOVY_VERSION = 'groovy.version'
+    private static final String FN_JAVA_FDK_VERSION = 'fn.java.fdk.version'
 
     private final Property<String> functionClass
     private final Property<String> functionMethod
@@ -118,7 +120,7 @@ class FnExtension {
      * Returns the FN Api dependency
      */
     Dependency api() {
-        String version = Versions.rawVersion('fn.java.fdk.version')
+        String version = Versions.rawVersion(FN_JAVA_FDK_VERSION)
         dependencyHandler.create("com.fnproject.fn:api:$version")
     }
 
@@ -126,8 +128,33 @@ class FnExtension {
      * Returns a compatible Groovy version
      */
     Dependency groovy() {
-        String version = Versions.rawVersion('groovy.version')
+        String version = Versions.rawVersion(GROOVY_VERSION)
         dependencyHandler.create("org.codehaus.groovy:groovy:$version")
+    }
+
+    /**
+     * Returns a compatible testing Groovy dependency
+     * @return
+     */
+    Dependency testingGroovy() {
+        String version = Versions.rawVersion(GROOVY_VERSION)
+        dependencyHandler.create("org.codehaus.groovy:groovy-test:$version")
+    }
+
+    /**
+     * Returns the core testing dependency
+     */
+    Dependency testingCore() {
+        String version = Versions.rawVersion(FN_JAVA_FDK_VERSION)
+        dependencyHandler.create("com.fnproject.fn:testing-core:$version")
+    }
+
+    /**
+     * Returns the compatibility library for Junit4
+     */
+    Dependency testingJunit4() {
+        String version = Versions.rawVersion(FN_JAVA_FDK_VERSION)
+        dependencyHandler.create("com.fnproject.fn:testing-junit4:$version")
     }
 
     /**

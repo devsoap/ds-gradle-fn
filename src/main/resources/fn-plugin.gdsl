@@ -30,6 +30,9 @@ contributor(fnCtx, {
         method name: 'api', type: gradleDependencyType
         method name: 'flow', type: gradleDependencyType
         method name: 'groovy', type: gradleDependencyType
+        method name: 'testingCore', type: gradleDependencyType
+        method name: 'testingJunit4', type: gradleDependencyType
+        method name: 'testingGroovy', type: gradleDependencyType
 
     }else if(!enclosingMember()){
         property name: "functionClass", type: String.name

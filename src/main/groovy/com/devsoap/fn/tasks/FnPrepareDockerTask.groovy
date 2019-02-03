@@ -309,7 +309,7 @@ class FnPrepareDockerTask extends DefaultTask {
      * Get the trigger path
      */
     List<String> getTriggerPaths() {
-        this.triggerPaths.getOrElse(["/${project.name}"])
+        this.triggerPaths.getOrElse(['/'])
     }
 
     /**
