@@ -42,10 +42,10 @@ class FnUtils {
      */
     static final String getFnExecutablePath(Project project) {
         File fnFolder = Paths.get(project.rootDir.canonicalPath, '.gradle', FN).toFile()
-        if (Os.isFamily(Os.FAMILY_UNIX)) {
-            new File(fnFolder, 'fn_linux').canonicalPath
-        } else if (Os.isFamily(Os.FAMILY_MAC)) {
+        if (Os.isFamily(Os.FAMILY_MAC)) {
             new File(fnFolder, 'fn_mac').canonicalPath
+        } else if (Os.isFamily(Os.FAMILY_UNIX)) {
+            new File(fnFolder, 'fn_linux').canonicalPath
         } else if (Os.isFamily(Os.FAMILY_WINDOWS)) {
             new File(fnFolder, 'fn.exe').canonicalPath
         } else {
