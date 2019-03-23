@@ -169,7 +169,7 @@ class FnPrepareDockerTask extends DefaultTask {
                     'functionName' : getFunctionName(),
                     'version' : (project.version == Project.DEFAULT_VERSION ? '0.0.0' : project.version),
                     'triggerName' : getTriggerName(),
-                    'triggerPaths' : getTriggerPaths(),
+                    'resolvedTriggerPaths' : getTriggerPaths(),
                     'triggerType' : getTriggerType(),
                     'functionTimeout' : getFunctionTimeout(),
                     'idleTimeout' : getIdleTimeout(),
@@ -308,7 +308,10 @@ class FnPrepareDockerTask extends DefaultTask {
      * Get the trigger path
      */
     List<String> getTriggerPaths() {
-        this.triggerPaths.getOrElse(['/'])
+        if (!this.triggerPaths.present || this.triggerPaths.get().isEmpty()) {
+            return ['/']
+        }
+        this.triggerPaths.get()
     }
 
     /**
@@ -359,6 +362,9 @@ class FnPrepareDockerTask extends DefaultTask {
      *      the path of the trigger
      */
     void setTriggerPaths(List<String> triggerPaths) {
+        if(triggerPaths.isEmpty()) {
+            throw new GradleException("Must define at least one path for function!")
+        }
         this.triggerPaths.set(triggerPaths)
     }
 
