@@ -170,7 +170,7 @@ class FnCreateFunctionTask extends DefaultTask {
         File gradleBuild = new File(root, 'build.gradle')
         gradleBuild << """
         fn {
-            functionClass = '${functionPackage}.$funcClassName'
+            functionClass = '${ functionPackage ? "${functionPackage}.${funcClassName}" : funcClassName }'
             functionMethod = '$funcMethodName'
         }
         """.stripIndent()
