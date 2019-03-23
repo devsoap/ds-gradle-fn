@@ -103,6 +103,9 @@ class FnDeployTask extends Exec {
             FnUtils.removeFunction(project, project.rootProject.name.toLowerCase(), fnDocker.functionName )
         }
 
+        logger.info("Ensuring app ${project.rootProject.name.toLowerCase()} exists...")
+        FnUtils.ensureAppExists(project, project.rootProject.name.toLowerCase())
+
         try {
             super.exec()
         } catch (ExecException e) {

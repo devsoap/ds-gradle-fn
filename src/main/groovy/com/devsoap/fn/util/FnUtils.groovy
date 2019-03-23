@@ -102,4 +102,25 @@ class FnUtils {
             }
         }
     }
+
+    /**
+     * Ensures that the given application has been registered
+     *
+     * @param project
+     *      the project
+     * @param application
+     *      the app
+     */
+    static final void ensureAppExists(Project project, String application) {
+        try {
+            project.exec {
+                commandLine getFnExecutablePath(project)
+                args 'create', 'app', application
+                standardOutput = LogUtils.getLogOutputStream(Level.INFO)
+                errorOutput = LogUtils.getLogOutputStream(Level.INFO)
+            }
+        } catch (ExecException ignored) {
+            // App already exists
+        }
+    }
 }
