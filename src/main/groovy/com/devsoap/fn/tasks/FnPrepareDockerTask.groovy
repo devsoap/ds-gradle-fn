@@ -167,8 +167,7 @@ class FnPrepareDockerTask extends DefaultTask {
                     .templateFileName(yaml.name)
                     .substitutions([
                     'functionName' : getFunctionName(),
-                    'version' : (project.version == Project.DEFAULT_VERSION ? '' : project.version)
-                            + new Date().format('yyyyMMddssmm'),
+                    'version' : (project.version == Project.DEFAULT_VERSION ? '0.0.0' : project.version),
                     'triggerName' : getTriggerName(),
                     'triggerPaths' : getTriggerPaths(),
                     'triggerType' : getTriggerType(),
