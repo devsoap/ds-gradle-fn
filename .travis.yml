@@ -1,10 +1,15 @@
 language: groovy
 jdk:
   - oraclejdk8
-script: "./gradlew --stacktrace --info --parallel check"
+script:
+  - "./gradlew --stacktrace --info --parallel check"
+after_script:
+  - docker ps -a
 branches:
   only:
     - "master"
+services:
+  - docker
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/

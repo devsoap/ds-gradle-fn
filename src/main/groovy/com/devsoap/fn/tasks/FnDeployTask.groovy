@@ -29,7 +29,6 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Optional
 import org.gradle.process.internal.ExecException
 
-import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 
 /**

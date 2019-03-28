@@ -47,7 +47,7 @@ targetCompatibility = 1.8
  * Sources
  *
  **********************************************************************************************************************/
-/*
+
 sourceSets {
     functionalTest {
         groovy {
@@ -60,7 +60,6 @@ sourceSets {
         runtimeClasspath += output + compileClasspath
     }
 }
-*/
 
 processResources {
     from(sourceSets.main.resources.srcDirs){
@@ -138,7 +137,7 @@ groovydoc {
  * Testing & Quality
  *
  ***********************************************************************************************************************/
-/*
+
 task functionalTest(type: Test) {
     dependsOn test
     group = 'Verification'
@@ -161,7 +160,6 @@ task functionalTest(type: Test) {
     }
 }
 check.dependsOn functionalTest
-*/
 
 codenarc{
     toolVersion = '1.1'
@@ -169,9 +167,9 @@ codenarc{
     maxPriority1Violations = 0
     maxPriority2Violations = 0
     maxPriority3Violations = 0
-   // codenarcFunctionalTest {
-  //      configFile = rootProject.file('config/codenarc/ruleset-test.groovy')
-   // }
+    codenarcFunctionalTest {
+        configFile = rootProject.file('config/codenarc/ruleset-test.groovy')
+    }
     codenarcTest {
         configFile = rootProject.file('config/codenarc/ruleset-test.groovy')
     }
@@ -198,7 +196,7 @@ plugins.withType(GroovyBasePlugin) {
  *
  ***********************************************************************************************************************/
 gradlePlugin {
-    //testSourceSets sourceSets.functionalTest
+    testSourceSets sourceSets.functionalTest
     plugins {
         fnPlugin {
             id = 'com.devsoap.fn'

@@ -32,10 +32,12 @@ class FnStopServerTask extends Exec {
 
     static String NAME = 'fnStop'
 
+    private static final String FNSERVER = 'fnserver'
+
     FnStopServerTask() {
         dependsOn FnInstallCliTask.NAME
         onlyIf {
-            DockerUtil.isContainerRunning(project, 'fnserver')
+            DockerUtil.isContainerRunning(project, FNSERVER)
         }
         description = 'Stops the local FN Server'
         group = 'fn'
@@ -43,5 +45,11 @@ class FnStopServerTask extends Exec {
         args  'stop'
         standardOutput = LogUtils.getLogOutputStream(Level.INFO)
         errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
+        doLast {
+            while (DockerUtil.isContainerRunning(project, FNSERVER)) {
+                logger.info('Waiting for fn server to stop...')
+                Thread.sleep(3000)
+            }
+        }
     }
 }

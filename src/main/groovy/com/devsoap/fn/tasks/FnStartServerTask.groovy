@@ -18,6 +18,7 @@ package com.devsoap.fn.tasks
 import com.devsoap.fn.util.DockerUtil
 import com.devsoap.fn.util.FnUtils
 import com.devsoap.fn.util.LogUtils
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.Exec
 
 import java.util.logging.Level
@@ -32,10 +33,12 @@ class FnStartServerTask extends Exec {
 
     static String NAME = 'fnStart'
 
+    private static final String FNSERVER = 'fnserver'
+
     FnStartServerTask() {
         dependsOn FnInstallCliTask.NAME
         onlyIf {
-           !DockerUtil.isContainerRunning(project, 'fnserver')
+           !DockerUtil.isContainerRunning(project, FNSERVER)
         }
         description = 'Starts the local FN Server'
         group = 'fn'
@@ -43,5 +46,11 @@ class FnStartServerTask extends Exec {
         args  'start', '-d'
         standardOutput = LogUtils.getLogOutputStream(Level.INFO)
         errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
+        doLast {
+            while (!DockerUtil.isContainerRunning(project, FNSERVER)) {
+                logger.info('Waiting for fn server to start...')
+                Thread.sleep(3000)
+            }
+        }
     }
 }

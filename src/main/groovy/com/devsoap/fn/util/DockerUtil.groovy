@@ -15,6 +15,9 @@
  */
 package com.devsoap.fn.util
 
+import groovy.json.StringEscapeUtils
+import org.apache.tools.ant.util.StringUtils
+import org.codehaus.groovy.util.StringUtil
 import org.gradle.api.Project
 import org.gradle.process.internal.ExecException
 
@@ -52,6 +55,6 @@ class DockerUtil {
             }.rethrowFailure()
         }
         String out = new String(propertyStream.toByteArray(), StandardCharsets.UTF_8)
-        out[1..-2] // Unquote
+        out.trim().replace("'", '')
     }
 }

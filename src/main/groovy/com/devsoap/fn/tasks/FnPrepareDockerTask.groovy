@@ -46,6 +46,7 @@ class FnPrepareDockerTask extends DefaultTask {
     private static final String EOL = '\n'
     private static final String DOCKER_APP_PATH = '/function/app/'
     private static final String LIBS_FOLDER = 'libs'
+    private static final int MAX_TRIGGER_LENGTH = 22
 
     /*
      * Use a custom function.yaml file
@@ -300,7 +301,8 @@ class FnPrepareDockerTask extends DefaultTask {
      * Get the trigger name
      */
     String getTriggerName() {
-        String defaultName = getFunctionName().length() >= 22 ? project.name : getFunctionName()
+        String defaultName = getFunctionName().length() >= MAX_TRIGGER_LENGTH ?
+                project.name[0..MAX_TRIGGER_LENGTH] : getFunctionName()
         this.triggerName.getOrElse("$defaultName-tgr")
     }
 

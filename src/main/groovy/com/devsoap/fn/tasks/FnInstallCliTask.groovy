@@ -16,6 +16,7 @@
 package com.devsoap.fn.tasks
 
 import com.devsoap.fn.util.FnUtils
+import com.devsoap.fn.util.Versions
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.DefaultTask
@@ -54,8 +55,16 @@ class FnInstallCliTask extends DefaultTask {
     @TaskAction
     void install() {
         logger.info('Fetching latest version tag of FN CLI...')
-        Object latest = new JsonSlurper().parseText(RELEASES_API.toURL().text)
-        String tag = latest['tag_name']
+        String tag
+        try {
+            Object latest = new JsonSlurper().parseText(RELEASES_API.toURL().text)
+            tag = latest['tag_name']
+        } catch (IOException e) {
+            // Request to Github API failed, maybe rate-limited. Fallback to a known working version
+            tag = Versions.rawVersion('fn.cli.fallback.version')
+            logger.warn("Failed to retrieve latest FN CLI version from $RELEASES_API, falling back to $tag")
+            logger.debug('', e)
+        }
 
         URL downloadLink
         if (Os.isFamily(Os.FAMILY_MAC)) {
@@ -71,10 +80,14 @@ class FnInstallCliTask extends DefaultTask {
         fnExecutable.parentFile.mkdirs()
 
         logger.info("Downloading FN CLI from $downloadLink...")
-        Channels.newChannel(downloadLink.openStream()).withCloseable { rbc ->
-            new FileOutputStream(fnExecutable).withStream { fos ->
-                fos.channel.transferFrom(rbc, 0L, Long.MAX_VALUE)
+        try {
+            Channels.newChannel(downloadLink.openStream()).withCloseable { rbc ->
+                new FileOutputStream(fnExecutable).withStream { fos ->
+                    fos.channel.transferFrom(rbc, 0L, Long.MAX_VALUE)
+                }
             }
+        } catch (IOException e) {
+            throw new GradleException("Failed to download FN CLI from $downloadLink", e)
         }
 
         fnExecutable.setExecutable(true, true)
