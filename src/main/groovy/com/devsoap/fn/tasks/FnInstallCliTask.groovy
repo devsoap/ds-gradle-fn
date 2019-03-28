@@ -58,10 +58,10 @@ class FnInstallCliTask extends DefaultTask {
         String tag = latest['tag_name']
 
         URL downloadLink
-        if (Os.isFamily(Os.FAMILY_UNIX)) {
-            downloadLink = "$DOWNLOAD_API/$tag/fn_linux".toURL()
-        } else if (Os.isFamily(Os.FAMILY_MAC)) {
+        if (Os.isFamily(Os.FAMILY_MAC)) {
             downloadLink = "$DOWNLOAD_API/$tag/fn_mac".toURL()
+        } else if (Os.isFamily(Os.FAMILY_UNIX)) {
+            downloadLink = "$DOWNLOAD_API/$tag/fn_linux".toURL()
         } else if (Os.isFamily(Os.FAMILY_WINDOWS)) {
             downloadLink = "$DOWNLOAD_API/$tag/fn.exe".toURL()
         } else {
