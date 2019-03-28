@@ -362,8 +362,8 @@ class FnPrepareDockerTask extends DefaultTask {
      *      the path of the trigger
      */
     void setTriggerPaths(List<String> triggerPaths) {
-        if(triggerPaths.isEmpty()) {
-            throw new GradleException("Must define at least one path for function!")
+        if (triggerPaths.isEmpty()) {
+            throw new GradleException('Must define at least one path for function!')
         }
         this.triggerPaths.set(triggerPaths)
     }
