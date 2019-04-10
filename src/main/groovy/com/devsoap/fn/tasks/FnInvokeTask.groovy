@@ -18,13 +18,11 @@ package com.devsoap.fn.tasks
 import com.devsoap.fn.util.FnUtils
 import groovy.json.JsonBuilder
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import org.gradle.process.ExecSpec
-import org.gradle.process.internal.ExecException
 
 import java.nio.charset.StandardCharsets
 
@@ -126,15 +124,6 @@ class FnInvokeTask extends DefaultTask {
             println ''
             println ''
 
-        } catch (IOException e) {
-            String callId = conn?.getHeaderField('Fn-Call-Id')
-            if (callId) {
-                String logs = getLogForCallId(project, fnDocker.functionName, callId)
-                logger.error(logs)
-                throw new GradleException("Invoking $application:$trigger (callId: $callId) failed!")
-            } else {
-                throw e
-            }
         } finally {
             conn?.disconnect()
         }
@@ -173,20 +162,6 @@ class FnInvokeTask extends DefaultTask {
 
         project.logger.info("Found triggers $triggers")
         triggers
-    }
-
-    private String getLogForCallId(Project project, String function, String callId) {
-        OutputStream logs = new ByteArrayOutputStream()
-        try {
-            project.exec { ExecSpec spec ->
-                spec.commandLine FnUtils.getFnExecutablePath(project)
-                spec.standardOutput = logs
-                spec.args 'get', 'logs', application, function, callId
-            }.assertNormalExitValue()
-            new String(logs.toByteArray(), StandardCharsets.UTF_8)
-        } catch (ExecException e) {
-            throw new GradleException('Failed to get logs from server, is the server running?')
-        }
     }
 
     private static String formatResponse(String response, String contentType) {

@@ -15,6 +15,7 @@
  */
 package com.devsoap.fn.tasks
 
+import com.devsoap.fn.extensions.FnExtension
 import com.devsoap.fn.util.DockerUtil
 import com.devsoap.fn.util.FnUtils
 import com.devsoap.fn.util.HashUtils
@@ -44,6 +45,7 @@ class FnDeployTask extends Exec {
 
     private static final String HASH_PROPERTY = 'fn-deploy-input-hash'
     private static final String FLOWSERVER = 'flowserver'
+    private static final String APP = 'app'
 
     /*
      * Should the local docker be used, or are we deploying to a remote instance
@@ -115,6 +117,18 @@ class FnDeployTask extends Exec {
             }
         }
 
+        // Configure syslog server if present
+        FnExtension fn = project.extensions.getByType(FnExtension)
+        if (fn.syslogUrl) {
+            project.exec {
+                workingDir(dockerImageDir)
+                commandLine FnUtils.getFnExecutablePath(project)
+                args 'update', APP, project.rootProject.name.toLowerCase(), "--syslog-url=${fn.syslogUrl}"
+                standardOutput = LogUtils.getLogOutputStream(Level.INFO)
+                errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
+            }
+        }
+
         if (isLocal()) {
 
             // Configure completer base url for Flow
@@ -125,15 +139,14 @@ class FnDeployTask extends Exec {
                 project.exec {
                     workingDir(dockerImageDir)
                     commandLine FnUtils.getFnExecutablePath(project)
-                    args 'config', 'app', project.rootProject.name.toLowerCase(), 'COMPLETER_BASE_URL', baseUrl
+                    args 'config', APP, project.rootProject.name.toLowerCase(), 'COMPLETER_BASE_URL', baseUrl
                     standardOutput = LogUtils.getLogOutputStream(Level.INFO)
                     errorOutput = LogUtils.getLogOutputStream(Level.SEVERE)
                 }
             }
-        } else {
-            logger.info("Function successfully deployed to registry ${registry.get()}")
         }
 
+        logger.info('Function successfully deployed.')
     }
 
     /**

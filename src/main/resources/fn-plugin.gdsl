@@ -49,6 +49,7 @@ contributor(closureCtx, {
         property name: "functionClass", type: String.name
         property name: 'functionMethod', type: String.name
         property name: 'functionPaths', type: List<String>.name
+        property name: 'syslogUrl', type: String.name
     }
 })
 

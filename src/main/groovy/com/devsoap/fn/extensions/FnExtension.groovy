@@ -38,6 +38,7 @@ class FnExtension {
 
     private final Property<String> functionClass
     private final Property<String> functionMethod
+    private final Property<String> syslogUrl
 
     private final DependencyHandler dependencyHandler
     private final RepositoryHandler repositoryHandler
@@ -47,6 +48,7 @@ class FnExtension {
         this.project = project
         functionClass = project.objects.property(String)
         functionMethod = project.objects.property(String)
+        syslogUrl = project.objects.property(String)
         dependencyHandler = project.dependencies
         repositoryHandler = project.repositories
     }
@@ -99,6 +101,20 @@ class FnExtension {
     List<String> getFunctionPaths() {
         FnPrepareDockerTask fnDocker = project.tasks.getByName(FnPrepareDockerTask.NAME)
         fnDocker.triggerPaths
+    }
+
+    /**
+     * Get the syslog server URL
+     */
+    String getSyslogUrl() {
+        syslogUrl.orNull
+    }
+
+    /**
+     * set the syslog server URL
+     */
+    void setSyslogUrl(String url) {
+        syslogUrl.set(url)
     }
 
     /**
