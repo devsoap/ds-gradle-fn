@@ -63,7 +63,7 @@ sourceSets {
 
 processResources {
     from(sourceSets.main.resources.srcDirs){
-        filesMatching('versions.properties'){
+        filesMatching('fn-plugin-versions.properties'){
             filter(ReplaceTokens, tokens: [
                     version: project.version
             ])
