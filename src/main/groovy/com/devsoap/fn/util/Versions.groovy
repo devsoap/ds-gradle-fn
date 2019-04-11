@@ -52,7 +52,7 @@ class Versions {
      */
     static final String rawVersion(String key) {
         Properties properties = new Properties()
-        Versions.getResourceAsStream( '/versions.properties' ).with {
+        Versions.getResourceAsStream( '/fn-plugin-versions.properties' ).with {
             properties.load(it)
         }
         if (properties.get(key)) {
