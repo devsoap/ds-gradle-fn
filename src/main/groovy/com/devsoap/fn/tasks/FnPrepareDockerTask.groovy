@@ -23,6 +23,7 @@ import groovy.transform.PackageScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -47,6 +48,7 @@ class FnPrepareDockerTask extends DefaultTask {
     private static final String DOCKER_APP_PATH = '/function/app/'
     private static final String LIBS_FOLDER = 'libs'
     private static final int MAX_TRIGGER_LENGTH = 22
+    private static final String FDK_DOCKER_IMAGE = 'fnproject/fn-java-fdk'
 
     /*
      * Use a custom function.yaml file
@@ -142,7 +144,15 @@ class FnPrepareDockerTask extends DefaultTask {
             dockerfile.createNewFile()
         }
 
-        setBaseImage('fnproject/fn-java-fdk', Versions.rawVersion('fn.java.fdk.baseimage.version'))
+        JavaPluginExtension java = project.extensions.getByType(JavaPluginExtension)
+        int majorVersion = Integer.parseInt(java.targetCompatibility.majorVersion)
+        if (majorVersion <= 9 ) {
+            setBaseImage(FDK_DOCKER_IMAGE, Versions.rawVersion('fn.java.fdk.baseimage.jdk9.version'))
+        } else if (majorVersion <= 11) {
+            setBaseImage(FDK_DOCKER_IMAGE, Versions.rawVersion('fn.java.fdk.baseimage.jdk11.version'))
+        } else {
+            throw new GradleException("Java version ${java.targetCompatibility} is not supported!")
+        }
 
         setWorkdirInDockerFile('/function')
 
