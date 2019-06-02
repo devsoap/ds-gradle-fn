@@ -37,7 +37,7 @@ contributor(fnCtx, {
     }else if(!enclosingMember()){
         property name: "functionClass", type: String.name
         property name: 'functionMethod', type: String.name
-        property name: 'functionPaths', type: List<String>.name
+        property name: 'functionPaths', type: List.name
     }
 })
 
@@ -48,7 +48,7 @@ contributor(closureCtx, {
     if(enclosingCall(fnProperty)) {
         property name: "functionClass", type: String.name
         property name: 'functionMethod', type: String.name
-        property name: 'functionPaths', type: List<String>.name
+        property name: 'functionPaths', type: List.name
         property name: 'syslogUrl', type: String.name
     }
 })
