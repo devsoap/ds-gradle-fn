@@ -47,7 +47,6 @@ pipeline {
       steps {
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'GithubID', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
           sh "rm -rf /tmp/docs; git clone --depth=1 https://github.com/devsoap/docs.git /tmp/docs"
-          sh "rm -rf /tmp/docs/docs/_fn_gradle_plugin_api; mkdir -p /tmp/docs/docs/_fn_gradle_plugin_api"
           sh "cp -R build/docs/groovydoc /tmp/docs/docs/_fn_gradle_plugin_api"
           dir('/tmp/docs') {
             sh "git config user.email 'jenkins@devsoap.com'"
