@@ -10,7 +10,7 @@ hood the plugin uses the Fn CLI (https://github.com/fnproject/cli) to perform th
 [![License](https://img.shields.io/github/license/devsoap/fn-gradle-plugin.svg)](https://github.com/devsoap/fn-gradle-plugin/blob/master/LICENSE)
 
 # Getting started
-To get started using the plugin have a look a the production documentation at hhttps://docs.devsoap.com/fn_gradle_plugin/
+To get started using the plugin have a look a the production documentation at https://docs.devsoap.com/fn_gradle_plugin/
 
 # Sponsors
 
