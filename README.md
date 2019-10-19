@@ -12,9 +12,19 @@ hood the plugin uses the Fn CLI (https://github.com/fnproject/cli) to perform th
 # Getting started
 To get started using the plugin have a look a the production documentation at https://docs.devsoap.com/fn_gradle_plugin/
 
-# Sponsors
+# Become PRO
 
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. To find out more about becoming a sponsor see the [Become a sponsor](https://devsoap.com/fn-project-gradle-plugin#supporttheproject) page.
+With a PRO subscription you will further get the following perks:
+
+* Early access to new features in the Gradle plugin
+* Priority treatment of bug issues on github
+* Access to PRO only documentation in DS Docs
+* A good and fuzzy feeling knowing you are supporting a Open Source project
+
+You can order your PRO subscription [here](https://devsoap.com/store/?product=gradle-vaadin-flow).
+
+*New!!* 
+For every pull request you get merged you will get a one month PRO subscription for **FREE**. Once the pull request is merged, monitor your email address used in your commit for the credentials.
 
 # License
 
