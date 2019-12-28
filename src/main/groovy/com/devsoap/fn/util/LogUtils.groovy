@@ -20,6 +20,7 @@ package com.devsoap.fn.util
 
 import groovy.transform.Memoized
 import groovy.util.logging.Log
+import org.gradle.api.Project
 
 import java.nio.charset.StandardCharsets
 import java.util.logging.Level
@@ -32,9 +33,12 @@ import java.util.logging.Level
  */
 class LogUtils {
 
-    @Memoized
     static final OutputStream getLogOutputStream(Level level) {
         new LogOutputStream(level)
+    }
+
+    static final void printIfNotPrintedBefore(Project project, String message, boolean licensed) {
+        SingletonPrinter.instance.printIfNotPrintedBefore(project, message, licensed)
     }
 
     @Log('LOGGER')
@@ -64,6 +68,24 @@ class LogUtils {
             if (mem.trim() != '') {
                 LOGGER.log(level, mem)
                 mem = ''
+            }
+        }
+    }
+
+    @Singleton(lazy = false, strict = true)
+    private static class SingletonPrinter {
+
+        private final Map<String, Boolean> messageStatus = [:]
+
+        void printIfNotPrintedBefore(Project project, String message, boolean licensed) {
+            messageStatus.putIfAbsent(message, true)
+            if ( messageStatus[message] ) {
+                if (!licensed) {
+                    project.logger.quiet(message)
+                } else if (project.logger.lifecycleEnabled) {
+                    project.logger.lifecycle(message)
+                }
+                messageStatus[message] = false
             }
         }
     }

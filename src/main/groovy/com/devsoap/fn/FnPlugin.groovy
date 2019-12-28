@@ -45,6 +45,7 @@ import javax.inject.Inject
 class FnPlugin implements Plugin<Project> {
 
     static final String PLUGIN_ID = 'com.devsoap.fn'
+    static final String PRODUCT_NAME = 'gradle-fn-plugin'
 
     private final List<PluginAction> actions = []
 

@@ -68,7 +68,8 @@ processResources {
     from(sourceSets.main.resources.srcDirs){
         filesMatching('fn-plugin-versions.properties'){
             filter(ReplaceTokens, tokens: [
-                    version: project.version
+                version: project.version,
+                signature: System.getenv('PRODUCT_SIGNATURE') ?: 'e1058e32-c659-4606-876d-6ace3703292f'
             ])
         }
     }
@@ -88,7 +89,7 @@ repositories {
 
 dependencies {
     compile localGroovy()
-
+    compile 'com.devsoap:devsoap-license-plugin:1.0.9'
     testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
         exclude group: 'org.codehaus.groovy'
     }

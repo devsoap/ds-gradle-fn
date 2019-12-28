@@ -21,6 +21,7 @@ buildscript {
 
     dependencies {
         classpath "com.devsoap:fn-gradle-plugin:$pluginVersion"
+        classpath "com.devsoap:devsoap-license-plugin:1.0.9"
 	}
 }
 

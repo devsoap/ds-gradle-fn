@@ -176,19 +176,20 @@ class FnPrepareDockerTask extends DefaultTask {
         if (functionYaml.isPresent()) {
             yaml.text = getFunctionYaml().text
         } else {
+            String resolvedVersion = (project.version == Project.DEFAULT_VERSION) ? '0.0.0' : project.version
             TemplateWriter.builder()
-                    .targetDir(dockerDir)
-                    .templateFileName(yaml.name)
-                    .substitutions([
-                            'functionName'        : getFunctionName(),
-                            'version'             : (project.version == Project.DEFAULT_VERSION ? '0.0.0' : project.version),
-                            'triggerName'         : getTriggerName(),
-                            'resolvedTriggerPaths': getTriggerPaths(),
-                            'triggerType'         : getTriggerType(),
-                            'functionTimeout'     : getFunctionTimeout(),
-                            'idleTimeout'         : getIdleTimeout(),
+                .targetDir(dockerDir)
+                .templateFileName(yaml.name)
+                .substitutions([
+                        'functionName'        : getFunctionName(),
+                        'version'             : resolvedVersion,
+                        'triggerName'         : getTriggerName(),
+                        'resolvedTriggerPaths': getTriggerPaths(),
+                        'triggerType'         : getTriggerType(),
+                        'functionTimeout'     : getFunctionTimeout(),
+                        'idleTimeout'         : getIdleTimeout(),
 
-                    ]).build().write()
+                ]).build().write()
         }
         yaml
     }
