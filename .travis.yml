@@ -1,6 +1,6 @@
 language: groovy
 jdk:
-  - oraclejdk8
+  - openjdk11
 script:
   - "./gradlew --stacktrace --info --parallel check"
 after_script:
