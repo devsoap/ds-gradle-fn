@@ -23,7 +23,6 @@ import com.devsoap.fn.util.LogUtils
 import com.devsoap.fn.util.Versions
 import com.devsoap.license.DevsoapLicenseExtension
 import com.devsoap.license.DevsoapLicensePlugin
-import com.devsoap.license.Validator
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 
@@ -84,21 +83,7 @@ class FnPluginAction extends PluginAction {
     @Override
     protected void executeAfterEvaluate(Project project) {
         super.executeAfterEvaluate(project)
-
         String pluginVersion = Versions.version(PLUGIN_VERSION_KEY)
-        if (Validator.isValidLicense(project, FnPlugin.PRODUCT_NAME)) {
-            DevsoapLicenseExtension devsoap = project.extensions[DevsoapLicenseExtension.NAME]
-            DevsoapLicenseExtension.Credential credential = devsoap.getCredential(FnPlugin.PRODUCT_NAME)
-            LogUtils.printIfNotPrintedBefore( project,
-                    "Using DS FN Plugin $pluginVersion (Licensed to ${credential.email})",
-                    true
-            )
-        } else {
-            LogUtils.printIfNotPrintedBefore( project,
-                    "Using DS FN Plugin $pluginVersion (UNLICENSED). Hide this message using --quiet " +
-                            'with PRO subscription.',
-                    false
-            )
-        }
+        LogUtils.printIfNotPrintedBefore( project, "Using DS FN Plugin $pluginVersion")
     }
 }
