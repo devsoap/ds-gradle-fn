@@ -12,19 +12,7 @@ hood the plugin uses the Fn CLI (https://github.com/fnproject/cli) to perform th
 # Getting started
 To get started using the plugin have a look a the production documentation at https://docs.devsoap.com/fn_gradle_plugin/
 
-# Become PRO
-
-With a PRO subscription you will further get the following perks:
-
-* Early access to new features in the Gradle plugin
-* Priority treatment of bug issues on github
-* Access to PRO only documentation in DS Docs
-* A good and fuzzy feeling knowing you are supporting a Open Source project
-
-You can order your PRO subscription [here](https://devsoap.com/store/?product=gradle-fn-plugin).
-
 # License
-
 This plugin is distributed under the Creative Commons Attribution-NoDerivatives 4.0 International Public License. For more information about the license see the LICENSE file in the root directory of the repository.
 
 A signed CLA is required when contributing to the project.
