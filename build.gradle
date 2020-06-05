@@ -89,7 +89,7 @@ repositories {
 
 dependencies {
     compile localGroovy()
-    compile 'com.devsoap:devsoap-license-plugin:1.0.9'
+    compile 'com.devsoap:devsoap-license-plugin:1.0.16'
     testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
         exclude group: 'org.codehaus.groovy'
     }
