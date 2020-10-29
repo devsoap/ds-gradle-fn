@@ -1,0 +1,93 @@
+kind: pipeline
+name: default
+type: docker
+
+steps:
+
+  - name: Build Plugin
+    image: gradle:jdk8
+    volumes:
+      - name: gradle
+        path: /home/gradle/.gradle
+    commands:
+      - ./gradlew assemble
+    environment:
+      ORG_GRADLE_PROJECT_BUILD_VERSION: ${DRONE_TAG}
+
+  - name: Test Plugin
+    image: gradle:jdk8
+    volumes:
+      - name: gradle
+        path: /home/gradle/.gradle
+    commands:
+      - ./gradlew --stacktrace --info --parallel check
+    environment:
+      ORG_GRADLE_PROJECT_BUILD_VERSION: ${DRONE_TAG}
+
+  - name: Build Documentation
+    image: gradle:jdk8
+    volumes:
+      - name: gradle
+        path: /home/gradle/.gradle
+    commands:
+      - ./gradlew groovyDoc
+    environment:
+      ORG_GRADLE_PROJECT_BUILD_VERSION: ${DRONE_TAG}
+    when:
+      target:
+        - production
+
+  - name: Publish Plugin
+    image: gradle:jdk8
+    volumes:
+      - name: gradle
+        path: /home/gradle/.gradle
+    commands:
+      - ./gradlew publishPlugins
+    environment:
+      ORG_GRADLE_PROJECT_BUILD_VERSION: ${DRONE_TAG}
+      ORG_GRADLE_PROJECT_gradle.publish.key:
+        from_secret: GRADLE_PUBLISH_KEY
+      ORG_GRADLE_PROJECT_gradle.publish.secret:
+        from_secret: GRADLE_PUBLISH_SECRET
+    when:
+      target:
+        - production
+
+  - name: Publish Documentation
+    image: docker:git
+    commands:
+      - git clone --depth=1 https://github.com/devsoap/docs.git /tmp/docs
+      - cp -R build/docs/groovydoc /tmp/docs/docs/_fn_gradle_plugin_api
+      - cd /tmp/docs
+      - git config user.email 'ci@devsoap.com'
+      - git config user.name 'Devsoap Build Bot'
+      - git checkout -b fn-gradle-plugin/${DRONE_TAG}
+      - git add docs/_fn_gradle_plugin_api
+      - git commit -m 'Update API documentation for FN Gradle Plugin ${DRONE_TAG}'
+      - git push docs fn-gradle-plugin/${DRONE_TAG}
+    when:
+      target:
+        - production
+
+  - name: Cleanup
+    image: gradle:jdk8
+    volumes:
+      - name: gradle
+        path: /home/gradle/.gradle
+    commands:
+      - rm -rf /tmp/docs
+      - ./gradlew clean
+      - ./gradlew --stop
+    environment:
+      ORG_GRADLE_PROJECT_BUILD_VERSION: ${DRONE_TAG}
+
+trigger:
+  ref:
+    include:
+      - refs/tags/**
+
+volumes:
+  - name: gradle
+    host:
+      path: /tmp/drone/gradle
