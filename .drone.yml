@@ -57,7 +57,7 @@ steps:
   - name: Publish Documentation
     image: docker:git
     commands:
-      - git clone --depth=1 git@github.com/devsoap/docs.git /tmp/docs
+      - git clone --depth=1 git@github.com:devsoap/docs.git /tmp/docs
       - cp -R build/docs/groovydoc /tmp/docs/docs/_fn_gradle_plugin_api
       - cd /tmp/docs
       - git config user.email 'ci@devsoap.com'
