@@ -64,7 +64,7 @@ steps:
       - git config user.name 'Devsoap Build Bot'
       - git checkout -b fn-gradle-plugin/$${DRONE_TAG}
       - git add docs/_fn_gradle_plugin_api
-      - git commit -m 'Update API documentation for FN Gradle Plugin $${DRONE_TAG}'
+      - git commit -m "Update API documentation for FN Gradle Plugin ${DRONE_TAG}"
       - git push origin fn-gradle-plugin/$${DRONE_TAG}
     environment:
       GITHUB_USERNAME:
